@@ -228,12 +228,6 @@ textarea { resize: vertical; min-height: 80px; }
 .export-btn:hover { border-color: var(--accent); color: var(--accent); }
 .export-btn.primary { background: var(--accent); color: white; border-color: transparent; }
 .export-btn.primary:hover { background: #6a5ef5; }
-.export-btn.sheets { background: #1a7f4b; color: white; border-color: transparent; }
-.export-btn.sheets:hover { background: #166b3e; }
-.export-btn.sheets:disabled { opacity: 0.5; cursor: not-allowed; }
-#sheetsStatus { margin-top: 1rem; padding: 12px 16px; border-radius: var(--r); font-size: 13px; display: none; }
-#sheetsStatus.ok { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: var(--success); display: block; }
-#sheetsStatus.err { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: var(--accent3); display: block; }
 
 /* ── TOAST ── */
 #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 1px solid var(--border2); border-radius: 100px; padding: 10px 20px; font-size: 13px; color: var(--text2); z-index: 1000; opacity: 0; transition: opacity 0.25s; pointer-events: none; white-space: nowrap; }
@@ -317,7 +311,7 @@ textarea { resize: vertical; min-height: 80px; }
           <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
           <button class="api-toggle" onclick="toggleApiVis()" title="Mostrar/ocultar">👁</button>
         </div>
-        <p style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">Guardada en sesión. Los resultados se guardan automáticamente en Google Sheets al finalizar.</p>
+        <p style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">La clave se usa solo en tu navegador y nunca se almacena.</p>
         <div class="mt2">
           <label for="modelSelect">Modelo de IA</label>
           <select id="modelSelect">
@@ -497,12 +491,10 @@ textarea { resize: vertical; min-height: 80px; }
       <div class="qa-list" id="qaList"></div>
     </div>
     <div class="export-row">
-      <button class="export-btn sheets hidden" id="sheetsBtn" onclick="saveToSheets()">Reintentar guardar en Sheets</button>
       <button class="export-btn primary" onclick="exportJSON()">Exportar JSON</button>
       <button class="export-btn" onclick="exportCSV()">Exportar CSV</button>
       <button class="export-btn" onclick="goToSetup()">Nueva evaluación</button>
     </div>
-    <div id="sheetsStatus"></div>
 
     <div class="fraud-section" id="fraudSection" style="display:none">
       <div class="fraud-header" onclick="document.getElementById('fraudBody').classList.toggle('hidden')">
@@ -528,8 +520,6 @@ textarea { resize: vertical; min-height: 80px; }
 <div id="toast"></div>
 
 <script>
-const GAS_URL = 'https://script.google.com/a/macros/umh.es/s/AKfycbxc5ttWN9v4TblPlGJYH3526Hxe75jS0ry1zCdEP3MU8eYOPMr13YtpDuuL4R_zG_4/exec';
-
 const PROMPT_EXAMPLES = [
   'Enf\u00f3cate en interpretaci\u00f3n cl\u00ednica y aplicaci\u00f3n pr\u00e1ctica. Evita preguntas sobre sintaxis de c\u00f3digo.',
   'Usa un tono socr\u00e1tico: no des pistas en las preguntas. Pregunta siempre "\u00bfpor qu\u00e9?" y "\u00bfen qu\u00e9 contexto?".',
@@ -541,7 +531,6 @@ const state = {
   studentName: '', subject: '', numQuestions: 8, difficulty: 'Intermedio', customPrompt: '',
   files: [], questions: [], rubrics: [], answers: [], feedbacks: [],
   currentQ: 0, transcript: '', startTime: null, endTime: null, finalScore: null,
-  _sheetsResult: null,
   fraudSignals: []   // one entry per question
 };
 
@@ -599,7 +588,7 @@ function showScreen(id) {
 function goToSetup() {
   clearSession();
   state.questions = []; state.answers = []; state.feedbacks = [];
-  state.currentQ = 0; state.transcript = ''; state.finalScore = null; state._sheetsResult = null;
+  state.currentQ = 0; state.transcript = ''; state.finalScore = null;
   const btn = document.getElementById('startBtn');
   btn.disabled = false;
   document.getElementById('startBtnText').textContent = 'Iniciar Evaluacion Oral';
@@ -1203,13 +1192,6 @@ Eval\u00faa y devuelve SOLO JSON v\u00e1lido:
     document.querySelector('#step-1 .pt-desc').textContent = 'Analizando patrones de habla y se\u00f1ales de fraude';
     await runFraudAnalysis();
     setStep(1, 'done');
-
-    // Auto-save
-    setStep(2, 'active');
-    document.querySelector('#step-2 .pt-name').textContent = 'Guardando en Google Sheets';
-    document.querySelector('#step-2 .pt-desc').textContent = 'Enviando resultados completos';
-    await autoSaveToSheets();
-    setStep(2, 'done');
     document.getElementById('globalProgressFill').style.width = '100%';
 
     await delay(400);
@@ -1246,17 +1228,6 @@ function renderResults() {
     <div class="stat-card"><div class="sc-label">Duraci\u00f3n (min)<\/div><div class="sc-value">${duration}<\/div><\/div>
     <div class="stat-card"><div class="sc-label">Dificultad<\/div><div class="sc-value" style="font-size:1rem">${state.difficulty}<\/div><\/div>`;
 
-  // Sheets button: hide if saved OK, show as retry if failed
-  const r = state._sheetsResult;
-  const sheetsBtn = document.getElementById('sheetsBtn');
-  if (r && r.status === 'ok') {
-    sheetsBtn.classList.add('hidden');
-    showSheetsStatus('ok', 'Evaluacion guardada automaticamente en Google Sheets.');
-  } else if (r && r.status === 'error') {
-    sheetsBtn.classList.remove('hidden');
-    showSheetsStatus('err', `El guardado autom\u00e1tico fall\u00f3: ${r.message || 'error desconocido'}.`);
-  }
-
   document.getElementById('qaList').innerHTML = state.questions.map((q, i) => {
     const ans = state.answers[i] || '(Sin respuesta)';
     const fb = state.feedbacks[i] || {};
@@ -1289,76 +1260,12 @@ function toggleQA(idx) { document.getElementById(`qa-${idx}`).classList.toggle('
 function postRenderResults() { renderFraudReport(); }
 
 // -- SHEETS --
-function buildSheetsPayload() {
-  const duration = state.endTime && state.startTime ? Math.round((state.endTime - state.startTime) / 60000) : 0;
-  const qaColumns = {};
-  state.questions.forEach((q, i) => {
-    const n = i + 1;
-    qaColumns[`Pregunta_${n}`]         = q.text || '';
-    qaColumns[`Bloom_${n}`]            = q.bloom_level || '';
-    qaColumns[`Concepto_${n}`]         = q.concept || '';
-    qaColumns[`Archivo_Fuente_${n}`]   = q.source_file || '';
-    qaColumns[`Evidencia_${n}`]        = q.source_evidence || '';
-    qaColumns[`Respuesta_${n}`]        = state.answers[i] || '(sin respuesta)';
-    qaColumns[`Nota_${n}`]             = state.feedbacks[i]?.score ?? '';
-    qaColumns[`Retroalimentacion_${n}`]= state.feedbacks[i]?.feedback || '';
-    qaColumns[`Fortalezas_${n}`]       = state.feedbacks[i]?.strengths || '';
-    qaColumns[`Mejoras_${n}`]          = state.feedbacks[i]?.improvements || '';
-  });
-  return {
-    Timestamp: new Date().toISOString(), Estudiante: state.studentName,
-    Asignatura: state.subject, Dificultad: state.difficulty,
-    Num_Preguntas: state.numQuestions, Nota_Final: state.finalScore ?? '',
-    Duracion_Minutos: duration, Archivos_Materiales: state.files.map(f=>f.name).join('; ') || '(sin archivos)',
-    Instrucciones_Extra: state.customPrompt || '',
-    Indice_Sospecha_Global: state._fraudReport ? state._fraudReport.globalScore : '',
-    Nivel_Sospecha: state._fraudReport ? state._fraudReport.globalLevel : '',
-    ...qaColumns,
-    ...(state._fraudReport ? state._fraudReport.sheetsColumns : {})
-  };
-}
 
-async function autoSaveToSheets() {
-  try {
-    await postNoCors(GAS_URL, buildSheetsPayload());
-    // no-cors means we can't read the response — assume ok if no network error
-    state._sheetsResult = { status: 'ok' };
-  } catch(err) {
-    state._sheetsResult = { status: 'error', message: err.message };
-  }
-}
 
 // Sends data via fetch no-cors (bypasses CORS restriction on institutional GAS).
 // The server receives the data normally; we just can't read the response body.
-function postNoCors(url, payload) {
-  const formData = new URLSearchParams();
-  formData.append('payload', JSON.stringify(payload));
-  return fetch(url, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: formData,
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-  });
-}
 
-async function saveToSheets() {
-  const btn = document.getElementById('sheetsBtn');
-  btn.disabled = true; btn.textContent = 'Guardando...';
-  try {
-    await postNoCors(GAS_URL, buildSheetsPayload());
-    btn.classList.add('hidden');
-    showSheetsStatus('ok', 'Guardado correctamente en Google Sheets.');
-  } catch(err) {
-    btn.disabled = false; btn.textContent = 'Reintentar guardar en Sheets';
-    showSheetsStatus('err', `Error de red: ${err.message}`);
-  }
-}
 
-function showSheetsStatus(type, html) {
-  const el = document.getElementById('sheetsStatus');
-  el.className = type; el.innerHTML = html;
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
 
 // -- EXPORT --
 function exportJSON() {
@@ -1483,22 +1390,7 @@ Devuelve SOLO JSON: {"ai_score": 0-100, "markers_found": ["..."], "markers_absen
 
   const globalScore = state.questions.length > 0 ? Math.round(globalTotal / state.questions.length) : 0;
   const globalLevel = globalScore >= 65 ? 'high' : globalScore >= 35 ? 'med' : 'low';
-
-  // Build sheets columns for fraud data
-  const sheetsColumns = {};
-  perQuestion.forEach((pq, i) => {
-    const n = i + 1;
-    sheetsColumns[`Fraude_Sospecha_${n}`] = pq.combined;
-    sheetsColumns[`Fraude_Nivel_${n}`]    = pq.level;
-    sheetsColumns[`Fraude_Latencia_${n}`] = pq.sig.latencyMs ? Math.round(pq.sig.latencyMs/1000) + 's' : '';
-    sheetsColumns[`Fraude_WPM_${n}`]      = pq.sig.wpm || '';
-    sheetsColumns[`Fraude_Fluidez_${n}`]  = pq.sig.fluencyRatio || '';
-    sheetsColumns[`Fraude_Varianza_${n}`] = pq.sig.chunkVarianceMs || '';
-    sheetsColumns[`Fraude_AI_${n}`]       = pq.linguistic.score;
-    sheetsColumns[`Fraude_Analisis_${n}`] = pq.linguistic.analysis;
-  });
-
-  state._fraudReport = { globalScore, globalLevel, perQuestion, sheetsColumns };
+  state._fraudReport = { globalScore, globalLevel, perQuestion };
 }
 
 function renderFraudReport() {
