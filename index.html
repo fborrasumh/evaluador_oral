@@ -550,7 +550,7 @@ let recTimerInterval = null;
 let recSeconds = 0;
 let lightMode = false;
 
-// ── INIT ──
+// -- INIT --
 window.addEventListener('DOMContentLoaded', () => {
   // Restore API key from sessionStorage
   const savedKey = sessionStorage.getItem('eval_apikey');
@@ -561,19 +561,19 @@ window.addEventListener('DOMContentLoaded', () => {
   checkSavedSession();
 });
 
-// ── THEME ──
+// -- THEME --
 function toggleTheme() {
   lightMode = !lightMode;
   document.body.classList.toggle('light', lightMode);
-  document.getElementById('themeBtn').textContent = lightMode ? '🌙 Modo oscuro' : '☀ Modo claro';
+  document.getElementById('themeBtn').textContent = lightMode ? 'Modo oscuro' : 'Modo claro';
 }
 
-// ── COLLAPSIBLE SECTION ──
+// -- COLLAPSIBLE SECTION --
 function toggleSection(bodyId, arrowId) {
   const body = document.getElementById(bodyId);
   const arrow = document.getElementById(arrowId);
   const collapsed = body.classList.toggle('collapsed');
-  arrow.textContent = collapsed ? '▼' : '▲';
+  arrow.textContent = collapsed ? '\u25BC' : '\u25B2';
   if (!body.style.maxHeight || body.style.maxHeight === '0px') {
     body.style.maxHeight = body.scrollHeight + 'px';
     body.style.opacity = '1';
@@ -589,7 +589,7 @@ window.addEventListener('DOMContentLoaded', () => {
   b.style.opacity = '1';
 });
 
-// ── NAVIGATION ──
+// -- NAVIGATION --
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -607,7 +607,7 @@ function goToSetup() {
   showScreen('setup');
 }
 
-// ── TOAST ──
+// -- TOAST --
 function toast(msg, dur = 3000) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -615,7 +615,7 @@ function toast(msg, dur = 3000) {
   setTimeout(() => t.classList.remove('visible'), dur);
 }
 
-// ── FIELD VALIDATION ──
+// -- FIELD VALIDATION --
 function validateField(id) {
   const el = document.getElementById(id);
   const err = document.getElementById('err-' + id);
@@ -625,13 +625,13 @@ function validateField(id) {
   return !empty;
 }
 
-// ── API TOGGLE ──
+// -- API TOGGLE --
 function toggleApiVis() {
   const inp = document.getElementById('apiKey');
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-// ── SUBJECT & PROMPT ──
+// -- SUBJECT & PROMPT --
 function setSubject(name) {
   document.getElementById('subjectInput').value = name;
   document.querySelectorAll('.subject-badge').forEach(b => b.classList.toggle('selected', b.textContent === name));
@@ -642,7 +642,7 @@ function setPromptEx(i) {
   document.getElementById('customPrompt').value = PROMPT_EXAMPLES[i];
 }
 
-// ── FILES ──
+// -- FILES --
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fileInput').addEventListener('change', e => Array.from(e.target.files).forEach(addFile));
   const zone = document.getElementById('uploadZone');
@@ -697,7 +697,7 @@ async function readFileContent(file) {
   });
 }
 
-// ── SESSION PERSISTENCE ──
+// -- SESSION PERSISTENCE --
 function saveSession() {
   try {
     const snap = {
@@ -743,7 +743,7 @@ function discardSession() {
   document.getElementById('restoreBanner').classList.remove('visible');
 }
 
-// ── OPENAI ──
+// -- OPENAI --
 async function callOpenAI(messages, model) {
   const useModel = model || state.selectedModel || 'gpt-4o-mini';
   const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -755,7 +755,7 @@ async function callOpenAI(messages, model) {
   return (await resp.json()).choices[0].message.content;
 }
 
-// ── PIPELINE ──
+// -- PIPELINE --
 const STEP_WEIGHTS = [15, 25, 15, 20, 15, 10]; // % of global progress per step (last = save)
 function setStep(idx, status) {
   const step = document.getElementById(`step-${idx}`);
@@ -783,14 +783,16 @@ async function runMultiAgentPipeline(contentContext) {
   setStep(0, 'active');
   await delay(200);
   const analyzerOut = await callOpenAI([{role:'user', content:
-    `Eres el Agente Analizador. Tu única fuente de información son los archivos del estudiante que se incluyen a continuación. PROHIBIDO usar conocimiento externo.
+    `Eres el Agente Analizador. Debes extraer conceptos EXCLUSIVAMENTE del texto que aparece a continuacion. PROHIBICION ABSOLUTA de usar conocimiento propio o externo. El tema lo dicta el contenido del archivo, no el nombre de la asignatura. Si el archivo trata de listas en Python, extrae conceptos de listas en Python.
 
-TAREA: Extrae los ${n > 6 ? Math.ceil(n*1.5) : n+4} conceptos, procedimientos o análisis que aparecen EXPLICITAMENTE en el material. Para cada uno cita en qué archivo aparece.
+TAREA: Extrae los ${n > 6 ? Math.ceil(n*1.5) : n+4} conceptos, metodos o procedimientos que aparecen TEXTUALMENTE en el material. Para cada uno incluye una cita literal del archivo que lo demuestra.
 
 MATERIAL:
 ${contentContext}
 
-Responde SOLO en JSON válido: {"concepts": [{"name":"...","type":"teórico|procedimental|aplicado","relevance":"alta|media","source_file":"...","description":"descripción breve basada únicamente en el material"}]}`
+Si el material no contiene suficientes conceptos, extrae todos los que haya sin inventar ninguno.
+
+Responde SOLO en JSON valido: {"concepts": [{"name":"...","type":"teorico|procedimental|aplicado","relevance":"alta|media","source_file":"...","literal_quote":"frase literal minimo 8 palabras","description":"descripcion basada unicamente en esa frase"}]}`
   }]);
   let concepts;
   try { concepts = JSON.parse(analyzerOut.replace(/```json|```/g,'').trim()).concepts; }
@@ -800,24 +802,28 @@ Responde SOLO en JSON válido: {"concepts": [{"name":"...","type":"teórico|proc
   setStep(1, 'active');
   await delay(200);
   const designerOut = await callOpenAI([{role:'user', content:
-    `Eres el Agente Diseñador de preguntas orales. REGLA ABSOLUTA: cada pregunta debe poder responderse únicamente con el contenido de los archivos del estudiante. Si no encuentras respaldo en el material, NO hagas la pregunta.
+    `Eres el Agente Disenador de preguntas orales. REGLA MAXIMA: cada pregunta debe estar anclada en una frase o fragmento que aparezca LITERALMENTE en el material. PROHIBIDO extrapolar, inferir temas relacionados o usar conocimiento externo. Si el material habla de listas de Python, las preguntas son sobre listas de Python. Si habla de bioestadistica, son sobre bioestadistica. El tema lo dicta el material, no el nombre de la asignatura.
 
-Asignatura: "${subject}" | Dificultad: ${diff} | Número de preguntas: ${n}
+Dificultad: ${diff} | Numero de preguntas: ${n}
 Instrucciones del profesor: ${extra || 'ninguna'}
 
-Conceptos extraídos del material:
+Conceptos extraidos del material (usa SOLO estos, no inventes otros):
 ${JSON.stringify(concepts)}
 
-MATERIAL COMPLETO (consulta para anclar cada pregunta):
+MATERIAL COMPLETO (fuente unica):
 ${state._rawMaterial ? state._rawMaterial.slice(0, 6000) : contentContext.slice(0, 6000)}
 
-Para cada pregunta:
-- El campo "text" es la pregunta oral, clara y abierta
-- El campo "source_evidence" es la frase o fragmento LITERAL del material que justifica la pregunta
-- El campo "concept" es el nombre del concepto del material al que pertenece
-- Nivel Bloom obligatorio: Comprender / Aplicar / Analizar / Evaluar / Crear (NO usar Recordar)
+EJEMPLO CORRECTO - si el material contiene "frase.split() convierte una frase en lista de palabras", pregunta valida: "Explica que hace el metodo split() y que estructura devuelve."
+EJEMPLO INCORRECTO - si el material es sobre listas de Python, NO puedes preguntar "como se aplica la bioestadistica" aunque la asignatura se llame asi.
 
-Responde SOLO en JSON válido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"...","source_evidence":"...","source_file":"..."}]}`
+Para cada pregunta incluye obligatoriamente:
+- "text": pregunta oral abierta sobre algo que aparece en el material
+- "source_evidence": cita LITERAL del material (minimo 10 palabras) que justifica la pregunta
+- "source_file": nombre del archivo donde aparece esa cita
+- "concept": nombre exacto del concepto segun aparece en el material
+- "bloom_level": Comprender / Aplicar / Analizar / Evaluar / Crear (NUNCA Recordar)
+
+Responde SOLO en JSON valido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"...","source_evidence":"...","source_file":"..."}]}`
   }]);
   let questions;
   try { questions = JSON.parse(designerOut.replace(/```json|```/g,'').trim()).questions; }
@@ -828,14 +834,14 @@ Responde SOLO en JSON válido: {"questions": [{"id":1,"text":"...","bloom_level"
   await delay(200);
   const evalOut = await callOpenAI([{role:'user', content:
     `Eres el Agente Evaluador de calidad. Revisa estas preguntas asegurando:
-1. Cada una está anclada en el material del estudiante (si alguna parece genérica, márcala para sustituir)
-2. No hay preguntas repetidas o muy similares entre sí
+1. Cada una est\u00e1 anclada en el material del estudiante (si alguna parece gen\u00e9rica, m\u00e1rcala para sustituir)
+2. No hay preguntas repetidas o muy similares entre s\u00ed
 3. El nivel de dificultad es "${diff}"
-4. Son apropiadas para evaluación oral
+4. Son apropiadas para evaluaci\u00f3n oral
 
 Conserva el campo "source_evidence" y "source_file" en cada pregunta.
 Preguntas: ${JSON.stringify(questions)}
-Responde SOLO en JSON válido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"...","source_evidence":"...","source_file":"..."}]}`
+Responde SOLO en JSON v\u00e1lido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"...","source_evidence":"...","source_file":"..."}]}`
   }]);
   try { questions = JSON.parse(evalOut.replace(/```json|```/g,'').trim()).questions; } catch {}
   setStep(2, 'done');
@@ -857,7 +863,7 @@ Responde SOLO en JSON v\u00e1lido: {"rubrics":[{"question_id":1,"key_points":[".
   await delay(200);
   if (state.files.length > 0) {
     const verOut = await callOpenAI([{role:'user', content:
-      `Eres el Agente Verificador. Tu tarea es garantizar que el 100% de las preguntas tienen respaldo explícito en el material del estudiante.
+      `Eres el Agente Verificador. Tu tarea es garantizar que el 100% de las preguntas tienen respaldo expl\u00edcito en el material del estudiante.
 
 MATERIAL:
 ${state._rawMaterial ? state._rawMaterial.slice(0, 7000) : contentContext.slice(0, 7000)}
@@ -866,12 +872,12 @@ PREGUNTAS A VERIFICAR:
 ${questions.map(q=>`${q.id}. ${q.text} [evidencia declarada: ${q.source_evidence||'ninguna'}]`).join('\n')}
 
 Para cada pregunta:
-- "ok": el concepto o análisis que pregunta aparece CLARAMENTE en el material
+- "ok": el concepto o an\u00e1lisis que pregunta aparece CLARAMENTE en el material
 - "sustituir": la pregunta no tiene respaldo en el material
 
-Si debes sustituir, genera una pregunta alternativa basada ESTRICTAMENTE en algo que sí aparezca en el material.
+Si debes sustituir, genera una pregunta alternativa basada ESTRICTAMENTE en algo que s\u00ed aparezca en el material.
 
-Responde SOLO en JSON válido: {"verifications":[{"question_id":1,"status":"ok","replacement":null,"justification":"..."}]}`
+Responde SOLO en JSON v\u00e1lido: {"verifications":[{"question_id":1,"status":"ok","replacement":null,"justification":"..."}]}`
     }]);
     try {
       const vs = JSON.parse(verOut.replace(/```json|```/g,'').trim()).verifications || [];
@@ -885,7 +891,7 @@ Responde SOLO en JSON válido: {"verifications":[{"question_id":1,"status":"ok",
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ── START EVALUATION ──
+// -- START EVALUATION --
 async function startEvaluation() {
   const apiKey = document.getElementById('apiKey').value.trim();
   const ok1 = validateField('studentName');
@@ -924,8 +930,10 @@ async function startEvaluation() {
       rawMaterial += `\n=== ARCHIVO: ${f.name} ===\n${await readFileContent(f)}\n`;
     }
   }
+  // IMPORTANT: when files exist, agents only see the raw material — NOT the subject name.
+  // The subject name can bias the agents toward general knowledge unrelated to the actual files.
   const contentContext = hasFiles
-    ? `ASIGNATURA: ${state.subject} | DIFICULTAD: ${state.difficulty}\n\nMATERIAL EXCLUSIVO DEL ESTUDIANTE (ÚNICA FUENTE PERMITIDA):\n${rawMaterial}`
+    ? `MATERIAL DEL ESTUDIANTE (UNICA FUENTE PERMITIDA - ignora cualquier conocimiento externo):\n${rawMaterial}`
     : `ASIGNATURA: ${state.subject} | DIFICULTAD: ${state.difficulty}\n\n(No se subieron archivos. Genera preguntas generales sobre los fundamentos de la asignatura.)`;
   state._hasFiles = hasFiles;
   state._rawMaterial = rawMaterial;
@@ -946,7 +954,7 @@ async function startEvaluation() {
   }
 }
 
-// ── EVALUATION FLOW ──
+// -- EVALUATION FLOW --
 function initEvaluation() {
   state.currentQ = state.currentQ || 0;
   document.getElementById('evalHeaderInfo').textContent = `${state.studentName} \u00b7 ${state.subject} \u00b7 ${state.difficulty}`;
@@ -984,7 +992,7 @@ function getAgentLabel(q) {
   return {'Recordar':'agente analizador','Comprender':'agente analizador','Aplicar':'agente disenyador','Analizar':'agente disenyador','Evaluar':'agente evaluador','Crear':'agente retroalimentador'}[q.bloom_level] || 'agente disenyador';
 }
 
-// ── REC TIMER ──
+// -- REC TIMER --
 function startRecTimer() {
   recSeconds = 0;
   document.getElementById('recTimer').textContent = '0:00';
@@ -1002,7 +1010,7 @@ function stopRecTimer() {
   document.getElementById('recIndicator').classList.remove('active');
 }
 
-// ── RECORDING ──
+// -- RECORDING --
 function startRecording() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) { toast('Grabacion no soportada. Puedes escribir tu respuesta.'); makeTranscriptEditable(); return; }
@@ -1110,7 +1118,7 @@ function makeTranscriptEditable() {
   box.addEventListener('input', () => { state.transcript = box.textContent; state.answers[state.currentQ] = state.transcript; });
 }
 
-// ── NEXT / CONFIRM ──
+// -- NEXT / CONFIRM --
 async function nextQuestion() {
   if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
   stopRecTimer();
@@ -1144,7 +1152,7 @@ async function doNextOrFinish() {
   }
 }
 
-// ── FINISH & EVALUATE ──
+// -- FINISH & EVALUATE --
 async function finishEvaluation() {
   state.endTime = new Date();
   clearSession();
@@ -1189,10 +1197,10 @@ Eval\u00faa y devuelve SOLO JSON v\u00e1lido:
     state.finalScore = Math.round(totalScore / state.questions.length * 10) / 10;
     setStep(0, 'done');
 
-    // ── FRAUD ANALYSIS ──
+    // -- FRAUD ANALYSIS --
     setStep(1, 'active');
     document.querySelector('#step-1 .pt-name').textContent = 'Agente de integridad';
-    document.querySelector('#step-1 .pt-desc').textContent = 'Analizando patrones de habla y señales de fraude';
+    document.querySelector('#step-1 .pt-desc').textContent = 'Analizando patrones de habla y se\u00f1ales de fraude';
     await runFraudAnalysis();
     setStep(1, 'done');
 
@@ -1216,7 +1224,7 @@ Eval\u00faa y devuelve SOLO JSON v\u00e1lido:
   }
 }
 
-// ── RESULTS ──
+// -- RESULTS --
 function renderResults() {
   const score = state.finalScore;
   const n = state.questions.length;
@@ -1280,7 +1288,7 @@ function toggleQA(idx) { document.getElementById(`qa-${idx}`).classList.toggle('
 // Called after renderResults
 function postRenderResults() { renderFraudReport(); }
 
-// ── SHEETS ──
+// -- SHEETS --
 function buildSheetsPayload() {
   const duration = state.endTime && state.startTime ? Math.round((state.endTime - state.startTime) / 60000) : 0;
   const qaColumns = {};
@@ -1352,7 +1360,7 @@ function showSheetsStatus(type, html) {
   el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ── EXPORT ──
+// -- EXPORT --
 function exportJSON() {
   const data = { timestamp: new Date().toISOString(), student: state.studentName, subject: state.subject, difficulty: state.difficulty, final_score: state.finalScore,
     questions: state.questions.map((q,i) => ({ id: q.id, text: q.text, bloom_level: q.bloom_level, concept: q.concept, answer: state.answers[i]||'', score: state.feedbacks[i]?.score??null, feedback: state.feedbacks[i]?.feedback??'', strengths: state.feedbacks[i]?.strengths??'', improvements: state.feedbacks[i]?.improvements??'' })) };
@@ -1445,13 +1453,13 @@ async function runFraudAnalysis() {
     if (ans && ans.trim().split(/\s+/).length >= 15) {
       try {
         const aiOut = await callOpenAI([{role:'user', content:
-          `Analiza si este texto transcrito de una respuesta oral tiene caracteristicas de texto generado por IA o leido, vs habla espontanea en español.
+          `Analiza si este texto transcrito de una respuesta oral tiene caracteristicas de texto generado por IA o leido, vs habla espontanea en espa\u00f1ol.
 
 Respuesta: "${ans.slice(0, 800)}"
 
 Busca: ausencia de muletillas (eh, bueno, o sea, a ver, es que), estructura demasiado perfecta, vocabulario excesivamente formal para ser oral, oraciones largas sin interrupciones, ausencia de auto-correcciones, inicio inmediato sin titubeos.
 
-Devuelve SOLO JSON: {"ai_score": 0-100, "markers_found": ["..."], "markers_absent": ["..."], "analysis": "frase corta en español"}`
+Devuelve SOLO JSON: {"ai_score": 0-100, "markers_found": ["..."], "markers_absent": ["..."], "analysis": "frase corta en espa\u00f1ol"}`
         }]);
         const parsed = JSON.parse(aiOut.replace(/```json|```/g,'').trim());
         linguistic = { score: parsed.ai_score || 0, analysis: parsed.analysis || '', markers: parsed.markers_found || [], absent: parsed.markers_absent || [] };
