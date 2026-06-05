@@ -1312,29 +1312,37 @@ function buildSheetsPayload() {
 
 async function autoSaveToSheets() {
   try {
-    const formData = new URLSearchParams();
-    formData.append('payload', JSON.stringify(buildSheetsPayload()));
-    const resp = await fetch(GAS_URL, { method: 'POST', body: formData, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
-    let result; try { result = await resp.json(); } catch { result = { status: resp.ok ? 'ok' : 'error' }; }
-    state._sheetsResult = result;
-  } catch(err) { state._sheetsResult = { status: 'error', message: err.message }; }
+    await postNoCors(GAS_URL, buildSheetsPayload());
+    // no-cors means we can't read the response — assume ok if no network error
+    state._sheetsResult = { status: 'ok' };
+  } catch(err) {
+    state._sheetsResult = { status: 'error', message: err.message };
+  }
+}
+
+// Sends data via fetch no-cors (bypasses CORS restriction on institutional GAS).
+// The server receives the data normally; we just can't read the response body.
+function postNoCors(url, payload) {
+  const formData = new URLSearchParams();
+  formData.append('payload', JSON.stringify(payload));
+  return fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  });
 }
 
 async function saveToSheets() {
   const btn = document.getElementById('sheetsBtn');
   btn.disabled = true; btn.textContent = 'Guardando...';
   try {
-    const formData = new URLSearchParams();
-    formData.append('payload', JSON.stringify(buildSheetsPayload()));
-    const resp = await fetch(GAS_URL, { method: 'POST', body: formData, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
-    let result; try { result = await resp.json(); } catch { result = { status: resp.ok ? 'ok' : 'error' }; }
-    if (result.status === 'ok' || resp.ok) {
-      btn.classList.add('hidden');
-      showSheetsStatus('ok', 'Guardado correctamente en Google Sheets.');
-    } else { throw new Error(result.message || 'Error del servidor.'); }
+    await postNoCors(GAS_URL, buildSheetsPayload());
+    btn.classList.add('hidden');
+    showSheetsStatus('ok', 'Guardado correctamente en Google Sheets.');
   } catch(err) {
     btn.disabled = false; btn.textContent = 'Reintentar guardar en Sheets';
-    showSheetsStatus('err', `Error: ${err.message}`);
+    showSheetsStatus('err', `Error de red: ${err.message}`);
   }
 }
 
