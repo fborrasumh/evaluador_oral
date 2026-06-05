@@ -370,11 +370,12 @@ textarea { resize: vertical; min-height: 80px; }
 
     <!-- ARCHIVOS -->
     <div class="section">
-      <div class="section-title" style="cursor:default">Materiales de referencia <span style="font-weight:400;color:var(--text3)">(opcional)</span></div>
+      <div class="section-title" style="cursor:default">Materiales del estudiante <span style="font-weight:400;color:var(--accent2)" id="filesLabel">— sube los archivos a evaluar</span></div>
       <div class="upload-zone" id="uploadZone">
         <input type="file" id="fileInput" accept=".ipynb,.py,.txt,.md,.pdf,.csv,.json" multiple>
         <div class="upload-icon">📎</div>
-        <p><strong>Arrastra archivos aquí</strong> o haz clic para seleccionar</p>
+        <p><strong>Arrastra los archivos del estudiante aquí</strong> o haz clic para seleccionar</p>
+        <p style="font-size:11px;margin-top:4px;color:var(--accent2)">Las preguntas se generarán exclusivamente desde estos materiales</p>
         <p style="font-size:11px;margin-top:4px">Soporta: .ipynb, .py, .txt, .md, .pdf, .csv, .json</p>
       </div>
       <div class="file-list" id="fileList"></div>
@@ -527,7 +528,7 @@ textarea { resize: vertical; min-height: 80px; }
 <div id="toast"></div>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyBM-7Sg0QKvQbyt9e6V3Fa5n57RZcy0s7O9VxGmnzRGywAF110HR34N4FN9Y7sv2fO/exec';
+const GAS_URL = 'https://script.google.com/a/macros/umh.es/s/AKfycbxc5ttWN9v4TblPlGJYH3526Hxe75jS0ry1zCdEP3MU8eYOPMr13YtpDuuL4R_zG_4/exec';
 
 const PROMPT_EXAMPLES = [
   'Enf\u00f3cate en interpretaci\u00f3n cl\u00ednica y aplicaci\u00f3n pr\u00e1ctica. Evita preguntas sobre sintaxis de c\u00f3digo.',
@@ -782,11 +783,14 @@ async function runMultiAgentPipeline(contentContext) {
   setStep(0, 'active');
   await delay(200);
   const analyzerOut = await callOpenAI([{role:'user', content:
-    `Eres el Agente Analizador, experto en ${subject}.
-Analiza el material e identifica los ${n > 6 ? Math.ceil(n*1.5) : n+4} conceptos m\u00e1s importantes.
-Para cada uno indica: nombre, tipo (te\u00f3rico/procedimental/aplicado), relevancia (alta/media).
-Material: ${contentContext}
-Responde SOLO en JSON v\u00e1lido: {"concepts": [{"name":"...","type":"...","relevance":"...","description":"..."}]}`
+    `Eres el Agente Analizador. Tu única fuente de información son los archivos del estudiante que se incluyen a continuación. PROHIBIDO usar conocimiento externo.
+
+TAREA: Extrae los ${n > 6 ? Math.ceil(n*1.5) : n+4} conceptos, procedimientos o análisis que aparecen EXPLICITAMENTE en el material. Para cada uno cita en qué archivo aparece.
+
+MATERIAL:
+${contentContext}
+
+Responde SOLO en JSON válido: {"concepts": [{"name":"...","type":"teórico|procedimental|aplicado","relevance":"alta|media","source_file":"...","description":"descripción breve basada únicamente en el material"}]}`
   }]);
   let concepts;
   try { concepts = JSON.parse(analyzerOut.replace(/```json|```/g,'').trim()).concepts; }
@@ -796,13 +800,24 @@ Responde SOLO en JSON v\u00e1lido: {"concepts": [{"name":"...","type":"...","rel
   setStep(1, 'active');
   await delay(200);
   const designerOut = await callOpenAI([{role:'user', content:
-    `Eres el Agente Dise\u00f1ador de preguntas orales, experto en taxonom\u00eda de Bloom.
-Asignatura: "${subject}" | Dificultad: ${diff} | Preguntas: ${n}
+    `Eres el Agente Diseñador de preguntas orales. REGLA ABSOLUTA: cada pregunta debe poder responderse únicamente con el contenido de los archivos del estudiante. Si no encuentras respaldo en el material, NO hagas la pregunta.
+
+Asignatura: "${subject}" | Dificultad: ${diff} | Número de preguntas: ${n}
 Instrucciones del profesor: ${extra || 'ninguna'}
-Conceptos: ${JSON.stringify(concepts)}
-Dise\u00f1a exactamente ${n} preguntas abiertas que eval\u00faen comprensi\u00f3n profunda, NO memorizaci\u00f3n.
-Cada pregunta debe tener nivel Bloom, ser clara y espec\u00edfica.
-Responde SOLO en JSON v\u00e1lido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"..."}]}`
+
+Conceptos extraídos del material:
+${JSON.stringify(concepts)}
+
+MATERIAL COMPLETO (consulta para anclar cada pregunta):
+${state._rawMaterial ? state._rawMaterial.slice(0, 6000) : contentContext.slice(0, 6000)}
+
+Para cada pregunta:
+- El campo "text" es la pregunta oral, clara y abierta
+- El campo "source_evidence" es la frase o fragmento LITERAL del material que justifica la pregunta
+- El campo "concept" es el nombre del concepto del material al que pertenece
+- Nivel Bloom obligatorio: Comprender / Aplicar / Analizar / Evaluar / Crear (NO usar Recordar)
+
+Responde SOLO en JSON válido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"...","source_evidence":"...","source_file":"..."}]}`
   }]);
   let questions;
   try { questions = JSON.parse(designerOut.replace(/```json|```/g,'').trim()).questions; }
@@ -812,10 +827,15 @@ Responde SOLO en JSON v\u00e1lido: {"questions": [{"id":1,"text":"...","bloom_le
   setStep(2, 'active');
   await delay(200);
   const evalOut = await callOpenAI([{role:'user', content:
-    `Eres el Agente Evaluador, experto en did\u00e1ctica de "${subject}".
-Revisa estas ${n} preguntas: ajusta al nivel ${diff}, elimina repeticiones, asegura que sean orales.
+    `Eres el Agente Evaluador de calidad. Revisa estas preguntas asegurando:
+1. Cada una está anclada en el material del estudiante (si alguna parece genérica, márcala para sustituir)
+2. No hay preguntas repetidas o muy similares entre sí
+3. El nivel de dificultad es "${diff}"
+4. Son apropiadas para evaluación oral
+
+Conserva el campo "source_evidence" y "source_file" en cada pregunta.
 Preguntas: ${JSON.stringify(questions)}
-Responde SOLO en JSON v\u00e1lido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"..."}]}`
+Responde SOLO en JSON válido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"...","source_evidence":"...","source_file":"..."}]}`
   }]);
   try { questions = JSON.parse(evalOut.replace(/```json|```/g,'').trim()).questions; } catch {}
   setStep(2, 'done');
@@ -837,11 +857,21 @@ Responde SOLO en JSON v\u00e1lido: {"rubrics":[{"question_id":1,"key_points":[".
   await delay(200);
   if (state.files.length > 0) {
     const verOut = await callOpenAI([{role:'user', content:
-      `Eres el Agente Verificador. Comprueba si cada pregunta est\u00e1 respaldada por el material.
-Material: ${contentContext.slice(0, 6000)}
-Preguntas: ${questions.map(q=>`${q.id}. ${q.text}`).join('\n')}
-Para cada una: "ok" si est\u00e1 en el material, "sustituir" + pregunta alternativa si no lo est\u00e1.
-Responde SOLO en JSON v\u00e1lido: {"verifications":[{"question_id":1,"status":"ok","replacement":null}]}`
+      `Eres el Agente Verificador. Tu tarea es garantizar que el 100% de las preguntas tienen respaldo explícito en el material del estudiante.
+
+MATERIAL:
+${state._rawMaterial ? state._rawMaterial.slice(0, 7000) : contentContext.slice(0, 7000)}
+
+PREGUNTAS A VERIFICAR:
+${questions.map(q=>`${q.id}. ${q.text} [evidencia declarada: ${q.source_evidence||'ninguna'}]`).join('\n')}
+
+Para cada pregunta:
+- "ok": el concepto o análisis que pregunta aparece CLARAMENTE en el material
+- "sustituir": la pregunta no tiene respaldo en el material
+
+Si debes sustituir, genera una pregunta alternativa basada ESTRICTAMENTE en algo que sí aparezca en el material.
+
+Responde SOLO en JSON válido: {"verifications":[{"question_id":1,"status":"ok","replacement":null,"justification":"..."}]}`
     }]);
     try {
       const vs = JSON.parse(verOut.replace(/```json|```/g,'').trim()).verifications || [];
@@ -886,13 +916,19 @@ async function startEvaluation() {
   setTimeEstimate(state.selectedModel);
   showScreen('loading');
 
-  let contentContext = `Asignatura: ${state.subject}\nNivel: ${state.difficulty}\n`;
-  if (state.files.length > 0) {
-    contentContext += '\n--- MATERIAL DEL ESTUDIANTE ---\n';
-    for (const f of state.files) { contentContext += `\n[Archivo: ${f.name}]\n${await readFileContent(f)}\n`; }
-  } else {
-    contentContext += '\n(Sin archivos. Genera preguntas generales sobre la asignatura.)';
+  // Build content context — keep raw material separate for strict grounding
+  let rawMaterial = '';
+  let hasFiles = state.files.length > 0;
+  if (hasFiles) {
+    for (const f of state.files) {
+      rawMaterial += `\n=== ARCHIVO: ${f.name} ===\n${await readFileContent(f)}\n`;
+    }
   }
+  const contentContext = hasFiles
+    ? `ASIGNATURA: ${state.subject} | DIFICULTAD: ${state.difficulty}\n\nMATERIAL EXCLUSIVO DEL ESTUDIANTE (ÚNICA FUENTE PERMITIDA):\n${rawMaterial}`
+    : `ASIGNATURA: ${state.subject} | DIFICULTAD: ${state.difficulty}\n\n(No se subieron archivos. Genera preguntas generales sobre los fundamentos de la asignatura.)`;
+  state._hasFiles = hasFiles;
+  state._rawMaterial = rawMaterial;
 
   try {
     const { questions, rubrics } = await runMultiAgentPipeline(contentContext);
@@ -1250,14 +1286,16 @@ function buildSheetsPayload() {
   const qaColumns = {};
   state.questions.forEach((q, i) => {
     const n = i + 1;
-    qaColumns[`Pregunta_${n}`] = q.text || '';
-    qaColumns[`Bloom_${n}`] = q.bloom_level || '';
-    qaColumns[`Concepto_${n}`] = q.concept || '';
-    qaColumns[`Respuesta_${n}`] = state.answers[i] || '(sin respuesta)';
-    qaColumns[`Nota_${n}`] = state.feedbacks[i]?.score ?? '';
-    qaColumns[`Retroalimentacion_${n}`] = state.feedbacks[i]?.feedback || '';
-    qaColumns[`Fortalezas_${n}`] = state.feedbacks[i]?.strengths || '';
-    qaColumns[`Mejoras_${n}`] = state.feedbacks[i]?.improvements || '';
+    qaColumns[`Pregunta_${n}`]         = q.text || '';
+    qaColumns[`Bloom_${n}`]            = q.bloom_level || '';
+    qaColumns[`Concepto_${n}`]         = q.concept || '';
+    qaColumns[`Archivo_Fuente_${n}`]   = q.source_file || '';
+    qaColumns[`Evidencia_${n}`]        = q.source_evidence || '';
+    qaColumns[`Respuesta_${n}`]        = state.answers[i] || '(sin respuesta)';
+    qaColumns[`Nota_${n}`]             = state.feedbacks[i]?.score ?? '';
+    qaColumns[`Retroalimentacion_${n}`]= state.feedbacks[i]?.feedback || '';
+    qaColumns[`Fortalezas_${n}`]       = state.feedbacks[i]?.strengths || '';
+    qaColumns[`Mejoras_${n}`]          = state.feedbacks[i]?.improvements || '';
   });
   return {
     Timestamp: new Date().toISOString(), Estudiante: state.studentName,
@@ -1438,6 +1476,8 @@ Devuelve SOLO JSON: {"ai_score": 0-100, "markers_found": ["..."], "markers_absen
     sheetsColumns[`Fraude_Nivel_${n}`]    = pq.level;
     sheetsColumns[`Fraude_Latencia_${n}`] = pq.sig.latencyMs ? Math.round(pq.sig.latencyMs/1000) + 's' : '';
     sheetsColumns[`Fraude_WPM_${n}`]      = pq.sig.wpm || '';
+    sheetsColumns[`Fraude_Fluidez_${n}`]  = pq.sig.fluencyRatio || '';
+    sheetsColumns[`Fraude_Varianza_${n}`] = pq.sig.chunkVarianceMs || '';
     sheetsColumns[`Fraude_AI_${n}`]       = pq.linguistic.score;
     sheetsColumns[`Fraude_Analisis_${n}`] = pq.linguistic.analysis;
   });
