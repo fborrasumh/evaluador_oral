@@ -7,264 +7,132 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ── DARK / LIGHT THEME ── */
 :root {
-  --bg: #0d0f14;
-  --surface: #141720;
-  --surface2: #1c2030;
-  --surface3: #242840;
-  --accent: #7c6fff;
-  --accent2: #4ecdc4;
-  --accent3: #ff6b6b;
-  --gold: #f5c842;
-  --text: #e8eaf0;
-  --text2: #8b90a8;
-  --text3: #555c78;
-  --border: rgba(124,111,255,0.15);
-  --border2: rgba(255,255,255,0.06);
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --r: 12px;
-  --r2: 20px;
-  --mono: 'DM Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-  --serif: 'DM Serif Display', serif;
+  --bg: #0d0f14; --surface: #141720; --surface2: #1c2030; --surface3: #242840;
+  --accent: #7c6fff; --accent2: #4ecdc4; --accent3: #ff6b6b; --gold: #f5c842;
+  --text: #e8eaf0; --text2: #8b90a8; --text3: #555c78;
+  --border: rgba(124,111,255,0.15); --border2: rgba(255,255,255,0.06);
+  --success: #4ade80; --warning: #fbbf24;
+  --r: 12px; --r2: 20px;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif; --serif: 'DM Serif Display', serif;
+}
+body.light {
+  --bg: #f5f6fa; --surface: #ffffff; --surface2: #f0f1f7; --surface3: #e4e6f0;
+  --text: #1a1d2e; --text2: #4a4f6a; --text3: #9196b0;
+  --border2: rgba(0,0,0,0.07); --border: rgba(124,111,255,0.2);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 15px;
-  line-height: 1.6;
-  min-height: 100vh;
-}
-
-/* ─── NOISE TEXTURE ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ─── LAYOUT ─── */
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; min-height: 100vh; transition: background 0.3s, color 0.3s; }
 .app { position: relative; z-index: 1; }
-
-/* ─── SCREENS ─── */
 .screen { display: none; min-height: 100vh; }
 .screen.active { display: flex; flex-direction: column; }
 
-/* ─── HEADER ─── */
-.header {
-  padding: 2rem 2.5rem 1.5rem;
-  border-bottom: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.logo {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-.logo-text { font-family: var(--serif); font-size: 1.3rem; letter-spacing: -0.02em; }
+/* ── HEADER ── */
+.header { padding: 1.25rem 2rem; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 1rem; }
+.logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.logo-text { font-family: var(--serif); font-size: 1.2rem; letter-spacing: -0.02em; }
 .logo-text span { color: var(--accent); }
 .header-sub { font-size: 12px; color: var(--text3); font-family: var(--mono); margin-left: auto; }
+.theme-toggle { background: none; border: 1px solid var(--border2); border-radius: 100px; padding: 4px 12px; font-size: 12px; color: var(--text3); cursor: pointer; transition: all 0.15s; }
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ─── SETUP SCREEN ─── */
+/* ── SETUP ── */
 #setup { background: var(--bg); }
-.setup-inner { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 4rem; width: 100%; }
-
-.hero { margin-bottom: 3rem; }
-.hero h1 {
-  font-family: var(--serif);
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  margin-bottom: 0.75rem;
-}
+.setup-inner { max-width: 720px; margin: 0 auto; padding: 2.5rem 2rem 4rem; width: 100%; }
+.hero { margin-bottom: 2.5rem; }
+.hero h1 { font-family: var(--serif); font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 0.6rem; }
 .hero h1 em { font-style: italic; color: var(--accent); }
 .hero p { color: var(--text2); font-size: 1rem; max-width: 520px; }
+.agents-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; }
+.agent-pill { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-family: var(--mono); border: 1px solid var(--border2); color: var(--text3); display: flex; align-items: center; gap: 6px; }
+.agent-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); }
+.agent-pill.a1 { border-color: rgba(124,111,255,0.3); color: var(--accent); } .agent-pill.a1 .dot { background: var(--accent); }
+.agent-pill.a2 { border-color: rgba(78,205,196,0.3); color: var(--accent2); } .agent-pill.a2 .dot { background: var(--accent2); }
+.agent-pill.a3 { border-color: rgba(245,200,66,0.3); color: var(--gold); } .agent-pill.a3 .dot { background: var(--gold); }
+.agent-pill.a4 { border-color: rgba(255,107,107,0.3); color: var(--accent3); } .agent-pill.a4 .dot { background: var(--accent3); }
 
-.agents-strip {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  margin-bottom: 2.5rem;
-}
-.agent-pill {
-  padding: 5px 12px; border-radius: 100px;
-  font-size: 11px; font-family: var(--mono);
-  border: 1px solid var(--border2);
-  color: var(--text3);
-  display: flex; align-items: center; gap: 6px;
-}
-.agent-pill .dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--text3);
-}
-.agent-pill.a1 { border-color: rgba(124,111,255,0.3); color: var(--accent); }
-.agent-pill.a1 .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-.agent-pill.a2 { border-color: rgba(78,205,196,0.3); color: var(--accent2); }
-.agent-pill.a2 .dot { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
-.agent-pill.a3 { border-color: rgba(245,200,66,0.3); color: var(--gold); }
-.agent-pill.a3 .dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
-.agent-pill.a4 { border-color: rgba(255,107,107,0.3); color: var(--accent3); }
-.agent-pill.a4 .dot { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
-
-/* ─── FORM SECTION ─── */
-.section {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: var(--r2);
-  padding: 1.75rem;
-  margin-bottom: 1.25rem;
-}
-.section-title {
-  font-size: 11px; font-family: var(--mono);
-  color: var(--text3); text-transform: uppercase;
-  letter-spacing: 0.1em; margin-bottom: 1.25rem;
-  display: flex; align-items: center; gap: 8px;
-}
-.section-title::before {
-  content: '';
-  display: inline-block;
-  width: 20px; height: 1px;
-  background: var(--text3);
-}
+/* ── FORM ── */
+.section { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r2); padding: 1.5rem; margin-bottom: 1.25rem; }
+.section-title { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.section-title::before { content: ''; display: inline-block; width: 16px; height: 1px; background: var(--text3); }
+.section-title .st-arrow { margin-left: auto; transition: transform 0.2s; font-style: normal; }
+.section-title .st-lock { margin-left: auto; font-size: 13px; }
+.section-body { transition: max-height 0.3s ease, opacity 0.3s; overflow: hidden; }
+.section-body.collapsed { max-height: 0 !important; opacity: 0; }
 
 label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
 input[type="text"], input[type="password"], textarea, select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r);
-  padding: 0.65rem 0.9rem;
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  -webkit-appearance: none;
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r);
+  padding: 0.65rem 0.9rem; color: var(--text); font-family: var(--sans); font-size: 14px;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
 }
-input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124,111,255,0.12);
-}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,111,255,0.12); }
+input.invalid, select.invalid { border-color: var(--accent3) !important; }
+.field-error { font-size: 11px; color: var(--accent3); margin-top: 4px; font-family: var(--mono); display: none; }
+.field-error.visible { display: block; }
 select option { background: var(--surface2); }
-
 .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 540px) { .input-row { grid-template-columns: 1fr; } }
-
 textarea { resize: vertical; min-height: 80px; }
-
-/* ─── API KEY ─── */
 .api-row { position: relative; }
 .api-row input { padding-right: 2.5rem; font-family: var(--mono); font-size: 12px; }
-.api-toggle {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; color: var(--text3); cursor: pointer;
-  font-size: 16px; padding: 4px;
-}
+.api-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; }
 .api-toggle:hover { color: var(--text2); }
 
-/* ─── FILE UPLOAD ─── */
-.upload-zone {
-  border: 1.5px dashed var(--border2);
-  border-radius: var(--r2);
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  position: relative;
-}
-.upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--accent);
-  background: rgba(124,111,255,0.04);
-}
-.upload-zone input[type="file"] {
-  position: absolute; inset: 0;
-  opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  border: none; background: none; padding: 0;
-}
+/* ── PROMPT EXAMPLES ── */
+.prompt-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.prompt-ex { padding: 4px 12px; border-radius: 100px; font-size: 11px; border: 1px solid var(--border2); cursor: pointer; color: var(--text3); background: none; transition: all 0.15s; text-align: left; }
+.prompt-ex:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ── UPLOAD ── */
+.upload-zone { border: 1.5px dashed var(--border2); border-radius: var(--r2); padding: 1.75rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; position: relative; }
+.upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent); background: rgba(124,111,255,0.04); }
+.upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border: none; background: none; padding: 0; }
 .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.4; }
 .upload-zone p { color: var(--text2); font-size: 13px; }
-.upload-zone p strong { color: var(--text); }
 .file-list { margin-top: 1rem; display: flex; flex-direction: column; gap: 6px; }
-.file-item {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface2); border-radius: 8px; padding: 8px 12px;
-  font-size: 12px; font-family: var(--mono);
-}
+.file-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-family: var(--mono); }
 .file-item .fi-name { flex: 1; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-item .fi-size { color: var(--text3); }
 .file-item .fi-rm { background: none; border: none; color: var(--text3); cursor: pointer; padding: 0 4px; font-size: 16px; line-height: 1; }
 .file-item .fi-rm:hover { color: var(--accent3); }
 .fi-icon { width: 20px; height: 20px; background: rgba(124,111,255,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--accent); font-family: var(--mono); }
 
-/* ─── SUBJECT FIELD ─── */
+/* ── SUBJECT BADGES ── */
 .subject-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.subject-badge {
-  padding: 4px 12px; border-radius: 100px;
-  font-size: 12px; border: 1px solid var(--border2);
-  cursor: pointer; color: var(--text3);
-  transition: all 0.15s;
-  background: none;
-}
+.subject-badge { padding: 4px 12px; border-radius: 100px; font-size: 12px; border: 1px solid var(--border2); cursor: pointer; color: var(--text3); transition: all 0.15s; background: none; }
 .subject-badge:hover { border-color: var(--accent); color: var(--accent); }
 .subject-badge.selected { background: rgba(124,111,255,0.15); border-color: var(--accent); color: var(--accent); }
 
-/* ─── START BUTTON ─── */
-.start-btn {
-  width: 100%; padding: 1rem;
-  background: var(--accent);
-  color: white; border: none;
-  border-radius: var(--r2);
-  font-family: var(--sans); font-size: 16px; font-weight: 600;
-  cursor: pointer; margin-top: 1.5rem;
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-  letter-spacing: -0.01em;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
+/* ── START BTN ── */
+.start-btn { width: 100%; padding: 1rem; background: var(--accent); color: white; border: none; border-radius: var(--r2); font-family: var(--sans); font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 1.5rem; transition: transform 0.15s, box-shadow 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .start-btn:hover { background: #6a5ef5; box-shadow: 0 8px 30px rgba(124,111,255,0.3); transform: translateY(-1px); }
-.start-btn:active { transform: translateY(0); box-shadow: none; }
 .start-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* ─── LOADING SCREEN ─── */
-#loading {
-  background: var(--bg);
-  align-items: center; justify-content: center;
-  flex-direction: column;
-}
+/* ── SESSION RESTORE BANNER ── */
+#restoreBanner { background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.25); border-radius: var(--r); padding: 12px 16px; margin-bottom: 1.25rem; display: none; align-items: center; gap: 12px; font-size: 13px; }
+#restoreBanner.visible { display: flex; }
+.restore-btns { display: flex; gap: 8px; margin-left: auto; }
+.restore-btn { padding: 5px 14px; border-radius: 100px; font-size: 12px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); transition: all 0.15s; }
+.restore-btn.primary { background: var(--accent); color: white; border-color: transparent; }
+.restore-btn:hover { border-color: var(--accent); color: var(--accent); }
+.restore-btn.primary:hover { background: #6a5ef5; }
+
+/* ── LOADING ── */
+#loading { background: var(--bg); align-items: center; justify-content: center; flex-direction: column; }
 .loading-inner { max-width: 520px; width: 100%; padding: 2rem; text-align: center; }
 .loading-inner h2 { font-family: var(--serif); font-size: 1.8rem; margin-bottom: 0.5rem; }
-.loading-inner > p { color: var(--text2); margin-bottom: 2.5rem; font-size: 14px; }
-
-.pipeline {
-  display: flex; flex-direction: column; gap: 12px;
-  text-align: left; margin-bottom: 2rem;
-}
-.pipe-step {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px;
-  background: var(--surface); border-radius: var(--r);
-  border: 1px solid var(--border2);
-  transition: all 0.3s;
-}
+.loading-inner > p { color: var(--text2); margin-bottom: 1rem; font-size: 14px; }
+.global-progress { height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; margin-bottom: 0.75rem; }
+.global-progress-fill { height: 100%; background: var(--accent); transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.time-estimate { font-size: 12px; color: var(--text3); font-family: var(--mono); margin-bottom: 1.75rem; }
+.pipeline { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.pipe-step { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: var(--surface); border-radius: var(--r); border: 1px solid var(--border2); transition: all 0.3s; }
 .pipe-step.active { border-color: var(--accent); background: rgba(124,111,255,0.06); }
 .pipe-step.done { border-color: rgba(74,222,128,0.2); background: rgba(74,222,128,0.04); }
-.pipe-dot {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--surface2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-family: var(--mono);
-  color: var(--text3); flex-shrink: 0;
-  transition: all 0.3s;
-}
+.pipe-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-family: var(--mono); color: var(--text3); flex-shrink: 0; transition: all 0.3s; }
 .pipe-step.active .pipe-dot { background: var(--accent); color: white; animation: pulse 1.2s infinite; }
 .pipe-step.done .pipe-dot { background: var(--success); color: var(--bg); }
 @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(124,111,255,0.4); } 50% { box-shadow: 0 0 0 8px rgba(124,111,255,0); } }
@@ -275,272 +143,215 @@ textarea { resize: vertical; min-height: 80px; }
 .pipe-step.active .pipe-status { color: var(--accent); }
 .pipe-step.done .pipe-status { color: var(--success); }
 
-/* ─── EVALUATION SCREEN ─── */
+/* ── EVALUATION ── */
 #evaluation { background: var(--bg); }
 .eval-inner { max-width: 800px; margin: 0 auto; padding: 2rem; flex: 1; display: flex; flex-direction: column; }
-
-.eval-progress {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 2rem;
-}
+.eval-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
 .progress-bar { flex: 1; height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
 .progress-label { font-family: var(--mono); font-size: 11px; color: var(--text3); white-space: nowrap; }
-
-.question-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 2rem 2.5rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-.question-card::before {
-  content: '';
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, var(--accent), var(--accent2));
-  border-radius: 3px 0 0 3px;
-}
+.question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2); padding: 2rem 2.5rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+.question-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--accent), var(--accent2)); border-radius: 3px 0 0 3px; }
 .q-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
-.q-num {
-  font-family: var(--mono); font-size: 11px;
-  background: rgba(124,111,255,0.12);
-  color: var(--accent); padding: 3px 10px;
-  border-radius: 100px; border: 1px solid rgba(124,111,255,0.2);
-}
-.q-agent-badge {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--text3); padding: 3px 10px;
-  border-radius: 100px; border: 1px solid var(--border2);
-}
-.q-text {
-  font-family: var(--serif);
-  font-size: clamp(1.1rem, 2.5vw, 1.45rem);
-  line-height: 1.5;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-
-.tts-btn {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: 100px; padding: 8px 18px;
-  color: var(--text2); font-family: var(--sans);
-  font-size: 13px; cursor: pointer;
-  transition: all 0.15s;
-}
-.tts-btn:hover { border-color: var(--accent2); color: var(--accent2); }
-.tts-btn.speaking { border-color: var(--accent2); color: var(--accent2); animation: speaking-glow 1.5s infinite; }
-@keyframes speaking-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(78,205,196,0.2); } 50% { box-shadow: 0 0 0 6px rgba(78,205,196,0); } }
-
+.q-num { font-family: var(--mono); font-size: 11px; background: rgba(124,111,255,0.12); color: var(--accent); padding: 3px 10px; border-radius: 100px; border: 1px solid rgba(124,111,255,0.2); }
+.q-agent-badge { font-family: var(--mono); font-size: 10px; color: var(--text3); padding: 3px 10px; border-radius: 100px; border: 1px solid var(--border2); }
+.q-text { font-family: var(--serif); font-size: clamp(1.1rem, 2.5vw, 1.45rem); line-height: 1.5; letter-spacing: -0.02em; color: var(--text); }
 .answer-zone { margin-bottom: 1.5rem; }
 .answer-zone label { font-size: 12px; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
-
-.transcript-box {
-  min-height: 100px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r);
-  padding: 1rem;
-  font-size: 14px; line-height: 1.7;
-  color: var(--text);
-  position: relative;
-}
-.transcript-box.listening {
-  border-color: var(--accent3);
-  box-shadow: 0 0 0 3px rgba(255,107,107,0.1);
-}
+.transcript-box { min-height: 100px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--r); padding: 1rem; font-size: 14px; line-height: 1.7; color: var(--text); position: relative; }
+.transcript-box.listening { border-color: var(--accent3); box-shadow: 0 0 0 3px rgba(255,107,107,0.1); }
 .transcript-placeholder { color: var(--text3); font-style: italic; font-size: 13px; }
 .interim-text { color: var(--text3); font-style: italic; }
 
-.controls-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.rec-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 20px; border-radius: 100px;
-  font-family: var(--sans); font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all 0.15s; border: none;
-}
+/* ── REC INDICATOR ── */
+.rec-indicator { display: none; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); border-radius: 100px; margin-bottom: 1rem; font-size: 13px; color: var(--accent3); font-family: var(--mono); }
+.rec-indicator.active { display: flex; }
+.rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); animation: rec-blink 1s infinite; }
+@keyframes rec-blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+.rec-timer { font-variant-numeric: tabular-nums; }
+
+/* ── CONFIRM OVERLAY ── */
+.confirm-overlay { display: none; margin-bottom: 1rem; background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.25); border-radius: var(--r); padding: 14px 16px; }
+.confirm-overlay.visible { display: block; }
+.confirm-overlay p { font-size: 13px; color: var(--gold); margin-bottom: 10px; }
+.confirm-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.conf-btn { padding: 6px 16px; border-radius: 100px; font-size: 13px; cursor: pointer; border: 1px solid var(--border2); background: none; color: var(--text2); transition: all 0.15s; }
+.conf-btn.danger { background: var(--accent3); color: white; border-color: transparent; }
+.conf-btn:hover { border-color: var(--accent); color: var(--accent); }
+.conf-btn.danger:hover { background: #ff5252; }
+
+/* ── CONTROLS ── */
+.controls-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.rec-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 100px; font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; }
 .rec-btn.start { background: var(--accent3); color: white; }
 .rec-btn.start:hover { background: #ff5252; box-shadow: 0 4px 20px rgba(255,107,107,0.3); }
 .rec-btn.stop { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
-.rec-btn.stop:hover { border-color: var(--accent3); color: var(--accent3); }
-.rec-btn.stop.active { border-color: var(--accent3); color: var(--accent3); animation: rec-pulse 1s infinite; }
-@keyframes rec-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.3); } 50% { box-shadow: 0 0 0 8px rgba(255,107,107,0); } }
-
-.next-btn {
-  margin-left: auto;
-  display: flex; align-items: center; gap: 8px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: 100px; padding: 10px 20px;
-  color: var(--text2); font-family: var(--sans);
-  font-size: 14px; font-weight: 500; cursor: pointer;
-  transition: all 0.15s;
+.rec-btn.stop.active { border-color: var(--accent3); color: var(--accent3); }
+@media (max-width: 500px) {
+  .controls-row { flex-direction: column; align-items: stretch; }
+  .next-btn { margin-left: 0; width: 100%; justify-content: center; }
+  .rec-btn { justify-content: center; }
 }
+.next-btn { margin-left: auto; display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 100px; padding: 10px 20px; color: var(--text2); font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
 .next-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ─── RESULTS SCREEN ─── */
+/* ── RESULTS ── */
 #results { background: var(--bg); }
 .results-inner { max-width: 800px; margin: 0 auto; padding: 2rem 2rem 4rem; }
-
 .results-hero { text-align: center; padding: 2.5rem 0 2rem; }
 .results-hero h2 { font-family: var(--serif); font-size: 2.5rem; margin-bottom: 0.5rem; }
 .results-hero p { color: var(--text2); }
-
-.score-ring {
-  width: 120px; height: 120px; margin: 0 auto 2rem;
-  position: relative; display: flex; align-items: center; justify-content: center;
-}
+.score-ring { width: 120px; height: 120px; margin: 0 auto 2rem; position: relative; display: flex; align-items: center; justify-content: center; }
 .score-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
 .score-ring .ring-bg { fill: none; stroke: var(--surface3); stroke-width: 8; }
 .score-ring .ring-fill { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1); }
 .score-num { font-family: var(--serif); font-size: 2rem; color: var(--text); }
-
-.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 2rem; }
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border2);
-  border-radius: var(--r); padding: 1rem 1.25rem;
-}
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); padding: 1rem 1.25rem; }
 .stat-card .sc-label { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-bottom: 4px; }
 .stat-card .sc-value { font-size: 1.4rem; font-weight: 500; }
-
-.qa-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 2rem; }
-.qa-item {
-  background: var(--surface); border: 1px solid var(--border2);
-  border-radius: var(--r2); overflow: hidden;
-}
-.qa-header {
-  padding: 1rem 1.5rem; cursor: pointer;
-  display: flex; align-items: flex-start; gap: 12px;
-  transition: background 0.15s;
-}
+.qa-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 2rem; }
+.qa-item { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r2); overflow: hidden; }
+.qa-header { padding: 1rem 1.5rem; cursor: pointer; display: flex; align-items: flex-start; gap: 12px; transition: background 0.15s; }
 .qa-header:hover { background: var(--surface2); }
-.qa-qnum {
-  font-family: var(--mono); font-size: 11px;
-  background: rgba(124,111,255,0.12); color: var(--accent);
-  padding: 3px 8px; border-radius: 100px;
-  flex-shrink: 0; margin-top: 2px;
-}
+.qa-qnum { font-family: var(--mono); font-size: 11px; background: rgba(124,111,255,0.12); color: var(--accent); padding: 3px 8px; border-radius: 100px; flex-shrink: 0; margin-top: 2px; }
 .qa-qtext { flex: 1; font-size: 14px; font-weight: 500; line-height: 1.4; }
 .qa-chevron { color: var(--text3); font-size: 12px; margin-top: 3px; transition: transform 0.2s; }
 .qa-item.open .qa-chevron { transform: rotate(180deg); }
-.qa-body {
-  padding: 0 1.5rem 1.5rem;
-  display: none;
-  border-top: 1px solid var(--border2);
-  padding-top: 1rem;
-}
+.qa-body { padding: 0 1.5rem 1.5rem; display: none; border-top: 1px solid var(--border2); padding-top: 1rem; }
 .qa-item.open .qa-body { display: block; }
-.qa-answer {
-  font-size: 13px; color: var(--text2); line-height: 1.7;
-  white-space: pre-wrap; margin-bottom: 1rem;
-}
-.qa-feedback {
-  background: var(--surface2); border-radius: var(--r);
-  padding: 0.875rem 1rem; font-size: 13px; line-height: 1.7;
-}
-.qa-feedback .fb-label {
-  font-family: var(--mono); font-size: 10px; color: var(--accent);
-  text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 6px; display: block;
-}
-
+.qa-answer { font-size: 13px; color: var(--text2); line-height: 1.7; white-space: pre-wrap; margin-bottom: 1rem; }
+.qa-feedback { background: var(--surface2); border-radius: var(--r); padding: 0.875rem 1rem; font-size: 13px; line-height: 1.7; }
+.qa-feedback .fb-label { font-family: var(--mono); font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; display: block; }
 .export-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.export-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 20px; border-radius: 100px;
-  font-family: var(--sans); font-size: 14px; font-weight: 500;
-  cursor: pointer; transition: all 0.15s;
-  border: 1px solid var(--border2);
-  background: var(--surface); color: var(--text2);
-}
+.export-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 100px; font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); }
 .export-btn:hover { border-color: var(--accent); color: var(--accent); }
 .export-btn.primary { background: var(--accent); color: white; border-color: transparent; }
-.export-btn.primary:hover { background: #6a5ef5; box-shadow: 0 4px 20px rgba(124,111,255,0.3); }
+.export-btn.primary:hover { background: #6a5ef5; }
 .export-btn.sheets { background: #1a7f4b; color: white; border-color: transparent; }
-.export-btn.sheets:hover { background: #166b3e; box-shadow: 0 4px 20px rgba(26,127,75,0.35); }
-.export-btn.sheets:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
-.export-btn.sheets.saving { opacity: 0.7; cursor: not-allowed; }
-.export-btn.sheets.saved { background: #145c34; }
-
-/* ─── SHEETS STATUS ─── */
-#sheetsStatus {
-  margin-top: 1rem;
-  padding: 12px 16px;
-  border-radius: var(--r);
-  font-size: 13px;
-  display: none;
-}
+.export-btn.sheets:hover { background: #166b3e; }
+.export-btn.sheets:disabled { opacity: 0.5; cursor: not-allowed; }
+#sheetsStatus { margin-top: 1rem; padding: 12px 16px; border-radius: var(--r); font-size: 13px; display: none; }
 #sheetsStatus.ok { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: var(--success); display: block; }
 #sheetsStatus.err { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); color: var(--accent3); display: block; }
-#sheetsStatus a { color: inherit; text-decoration: underline; }
 
-/* ─── TOAST ─── */
-#toast {
-  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: 100px; padding: 10px 20px;
-  font-size: 13px; color: var(--text2);
-  z-index: 1000;
-  opacity: 0; transition: opacity 0.25s;
-  pointer-events: none; white-space: nowrap;
-}
+/* ── TOAST ── */
+#toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 1px solid var(--border2); border-radius: 100px; padding: 10px 20px; font-size: 13px; color: var(--text2); z-index: 1000; opacity: 0; transition: opacity 0.25s; pointer-events: none; white-space: nowrap; }
 #toast.visible { opacity: 1; }
-
-/* ─── UTIL ─── */
-.mt1 { margin-top: 0.5rem; }
-.mt2 { margin-top: 1rem; }
+.mt1 { margin-top: 0.5rem; } .mt2 { margin-top: 1rem; }
 .hidden { display: none !important; }
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── FRAUD DETECTION ── */
+.fraud-section { margin-top: 2rem; border-top: 1px solid var(--border2); padding-top: 1.5rem; }
+.fraud-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; cursor: pointer; }
+.fraud-header h3 { font-size: 13px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: .08em; }
+.fraud-toggle-btn { margin-left: auto; font-size: 11px; background: none; border: 1px solid var(--border2); border-radius: 100px; padding: 3px 12px; color: var(--text3); cursor: pointer; }
+.fraud-toggle-btn:hover { border-color: var(--warning); color: var(--warning); }
+.fraud-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+.fraud-card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); padding: .875rem 1rem; }
+.fraud-card .fc-label { font-size: 10px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.fraud-card .fc-val { font-size: 1.3rem; font-weight: 500; }
+.fraud-card .fc-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.fraud-card.risk-low { border-color: rgba(74,222,128,.2); }
+.fraud-card.risk-low .fc-val { color: var(--success); }
+.fraud-card.risk-med { border-color: rgba(251,191,36,.25); }
+.fraud-card.risk-med .fc-val { color: var(--warning); }
+.fraud-card.risk-high { border-color: rgba(255,107,107,.3); }
+.fraud-card.risk-high .fc-val { color: var(--accent3); }
+.suspicion-bar { height: 8px; background: var(--surface3); border-radius: 4px; overflow: hidden; margin: .5rem 0 .25rem; }
+.suspicion-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+.fraud-per-q { display: flex; flex-direction: column; gap: 8px; }
+.fraud-q-row { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); padding: .75rem 1rem; font-size: 13px; }
+.fraud-q-row .fqr-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.fraud-q-row .fqr-badge { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 100px; }
+.badge-low { background: rgba(74,222,128,.12); color: var(--success); }
+.badge-med { background: rgba(251,191,36,.12); color: var(--warning); }
+.badge-high { background: rgba(255,107,107,.14); color: var(--accent3); }
+.fraud-q-row .fqr-metrics { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.fraud-q-row .fqr-ai { margin-top: 6px; font-size: 12px; color: var(--text2); padding: 6px 10px; background: var(--surface2); border-radius: 8px; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- ════════════════════════════ SETUP SCREEN ════════════════════════════ -->
+<!-- ── SETUP ── -->
 <div id="setup" class="screen active">
   <div class="header">
     <div class="logo">🎙</div>
     <span class="logo-text">Evaluador <span>Oral</span> IA</span>
-    <span class="header-sub">v2.0 · multi-agent · openai</span>
+    <span class="header-sub">v3.0 · multi-agente</span>
   </div>
-
   <div class="setup-inner">
     <div class="hero">
       <h1>Evaluación oral<br><em>inteligente</em> para<br>cualquier asignatura</h1>
-      <p>Sube materiales, configura la evaluación y deja que cuatro agentes de IA generen preguntas profundas adaptadas al contenido.</p>
+      <p>Configura la sesión, sube los materiales y deja que cinco agentes generen y validen las preguntas.</p>
     </div>
-
     <div class="agents-strip">
       <div class="agent-pill a1"><span class="dot"></span>Analizador</div>
       <div class="agent-pill a2"><span class="dot"></span>Diseñador</div>
       <div class="agent-pill a3"><span class="dot"></span>Evaluador</div>
       <div class="agent-pill a4"><span class="dot"></span>Retroalimentador</div>
+      <div class="agent-pill" style="border-color:rgba(78,205,196,0.3);color:var(--accent2)"><span class="dot" style="background:var(--accent2)"></span>Verificador</div>
     </div>
 
-    <!-- API KEY -->
-    <div class="section">
-      <div class="section-title">Configuración API</div>
-      <label for="apiKey">OpenAI API Key</label>
-      <div class="api-row">
-        <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
-        <button class="api-toggle" onclick="toggleApiVis()" title="Mostrar/ocultar">👁</button>
+    <!-- Restore session banner -->
+    <div id="restoreBanner">
+      <span>Hay una evaluación en curso — ¿deseas continuar donde la dejaste?</span>
+      <div class="restore-btns">
+        <button class="restore-btn" onclick="discardSession()">Descartar</button>
+        <button class="restore-btn primary" onclick="restoreSession()">Continuar</button>
       </div>
-      <p style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">La clave se usa solo en tu navegador y nunca se almacena. Los resultados se guardan automáticamente en Google Sheets al finalizar.</p>
     </div>
 
-    <!-- STUDENT & SUBJECT -->
+    <!-- PROFESOR (colapsable) -->
+    <div class="section" id="sectionProfesor">
+      <div class="section-title" onclick="toggleSection('profesorBody', 'arrowProf')">
+        Configuración del profesor
+        <span id="arrowProf" class="st-arrow">▲</span>
+      </div>
+      <div class="section-body" id="profesorBody">
+        <label for="apiKey">OpenAI API Key</label>
+        <div class="api-row">
+          <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
+          <button class="api-toggle" onclick="toggleApiVis()" title="Mostrar/ocultar">👁</button>
+        </div>
+        <p style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">Guardada en sesión. Los resultados se guardan automáticamente en Google Sheets al finalizar.</p>
+        <div class="mt2">
+          <label for="modelSelect">Modelo de IA</label>
+          <select id="modelSelect">
+            <option value="gpt-4o-mini" selected>gpt-4o-mini — rápido y económico (recomendado)</option>
+            <option value="gpt-4o">gpt-4o — mayor calidad</option>
+            <option value="gpt-4-turbo">gpt-4-turbo — equilibrado</option>
+            <option value="o1-mini">o1-mini — razonamiento</option>
+          </select>
+        </div>
+        <div class="mt2">
+          <label for="customPrompt">Instrucciones adicionales (opcional)</label>
+          <textarea id="customPrompt" placeholder="Ej. Enfócate en interpretación clínica, evita preguntas de código..."></textarea>
+          <div class="prompt-examples mt1">
+            <button class="prompt-ex" onclick="setPromptEx(0)">Interpretación clínica</button>
+            <button class="prompt-ex" onclick="setPromptEx(1)">Tono socrático</button>
+            <button class="prompt-ex" onclick="setPromptEx(2)">Alternativas y limitaciones</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATOS DEL ESTUDIANTE -->
     <div class="section">
-      <div class="section-title">Datos de la sesión</div>
+      <div class="section-title" style="cursor:default">Datos del estudiante</div>
       <div class="input-row">
         <div>
           <label for="studentName">Nombre del estudiante</label>
-          <input type="text" id="studentName" placeholder="Ej. Ana García">
+          <input type="text" id="studentName" placeholder="Ej. Ana García" onblur="validateField('studentName')">
+          <div class="field-error" id="err-studentName">El nombre es obligatorio</div>
         </div>
         <div>
           <label for="subjectInput">Asignatura / Materia</label>
-          <input type="text" id="subjectInput" placeholder="Ej. Bioestadística Clínica">
+          <input type="text" id="subjectInput" placeholder="Ej. Bioestadística Clínica" onblur="validateField('subjectInput')">
+          <div class="field-error" id="err-subjectInput">La asignatura es obligatoria</div>
         </div>
       </div>
       <div class="subject-badges mt1" id="subjectBadges">
@@ -557,9 +368,9 @@ textarea { resize: vertical; min-height: 80px; }
       </div>
     </div>
 
-    <!-- FILES -->
+    <!-- ARCHIVOS -->
     <div class="section">
-      <div class="section-title">Materiales de referencia (opcional)</div>
+      <div class="section-title" style="cursor:default">Materiales de referencia <span style="font-weight:400;color:var(--text3)">(opcional)</span></div>
       <div class="upload-zone" id="uploadZone">
         <input type="file" id="fileInput" accept=".ipynb,.py,.txt,.md,.pdf,.csv,.json" multiple>
         <div class="upload-icon">📎</div>
@@ -571,7 +382,7 @@ textarea { resize: vertical; min-height: 80px; }
 
     <!-- CONFIG -->
     <div class="section">
-      <div class="section-title">Configuración de la evaluación</div>
+      <div class="section-title" style="cursor:default">Configuración de la evaluación</div>
       <div class="input-row">
         <div>
           <label for="numQuestions">Número de preguntas</label>
@@ -591,10 +402,6 @@ textarea { resize: vertical; min-height: 80px; }
           </select>
         </div>
       </div>
-      <div class="mt2">
-        <label for="customPrompt">Instrucciones adicionales para la IA (opcional)</label>
-        <textarea id="customPrompt" placeholder="Ej. Enfócate en aplicaciones clínicas. Evita preguntas sobre sintaxis de código..."></textarea>
-      </div>
     </div>
 
     <button class="start-btn" id="startBtn" onclick="startEvaluation()">
@@ -604,183 +411,202 @@ textarea { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
-<!-- ════════════════════════════ LOADING SCREEN ════════════════════════════ -->
+<!-- ── LOADING ── -->
 <div id="loading" class="screen">
   <div class="loading-inner">
     <h2>Preparando evaluación</h2>
-    <p>Los agentes están analizando el material y generando preguntas personalizadas…</p>
+    <p id="loadingDesc">Los agentes están analizando el material...</p>
+    <div class="global-progress"><div class="global-progress-fill" id="globalProgressFill" style="width:0%"></div></div>
+    <div class="time-estimate" id="timeEstimate">Tiempo estimado: ~30 s</div>
     <div class="pipeline" id="pipeline">
-      <div class="pipe-step" id="step-0">
-        <div class="pipe-dot">01</div>
-        <div class="pipe-text">
-          <div class="pt-name">Agente Analizador</div>
-          <div class="pt-desc">Extrae conceptos clave y estructura del contenido</div>
-        </div>
-        <div class="pipe-status">esperando</div>
-      </div>
-      <div class="pipe-step" id="step-1">
-        <div class="pipe-dot">02</div>
-        <div class="pipe-text">
-          <div class="pt-name">Agente Diseñador</div>
-          <div class="pt-desc">Diseña preguntas abiertas por nivel taxonómico</div>
-        </div>
-        <div class="pipe-status">esperando</div>
-      </div>
-      <div class="pipe-step" id="step-2">
-        <div class="pipe-dot">03</div>
-        <div class="pipe-text">
-          <div class="pt-name">Agente Evaluador</div>
-          <div class="pt-desc">Ajusta al nivel de dificultad y valida coherencia</div>
-        </div>
-        <div class="pipe-status">esperando</div>
-      </div>
-      <div class="pipe-step" id="step-3">
-        <div class="pipe-dot">04</div>
-        <div class="pipe-text">
-          <div class="pt-name">Agente Retroalimentador</div>
-          <div class="pt-desc">Prepara criterios de evaluación para cada pregunta</div>
-        </div>
-        <div class="pipe-status">esperando</div>
-      </div>
+      <div class="pipe-step" id="step-0"><div class="pipe-dot">01</div><div class="pipe-text"><div class="pt-name">Agente Analizador</div><div class="pt-desc">Extrae conceptos clave del contenido</div></div><div class="pipe-status">esperando</div></div>
+      <div class="pipe-step" id="step-1"><div class="pipe-dot">02</div><div class="pipe-text"><div class="pt-name">Agente Diseñador</div><div class="pt-desc">Diseña preguntas por nivel taxonómico</div></div><div class="pipe-status">esperando</div></div>
+      <div class="pipe-step" id="step-2"><div class="pipe-dot">03</div><div class="pipe-text"><div class="pt-name">Agente Evaluador</div><div class="pt-desc">Valida coherencia y dificultad</div></div><div class="pipe-status">esperando</div></div>
+      <div class="pipe-step" id="step-3"><div class="pipe-dot">04</div><div class="pipe-text"><div class="pt-name">Agente Retroalimentador</div><div class="pt-desc">Prepara rúbricas de evaluación</div></div><div class="pipe-status">esperando</div></div>
+      <div class="pipe-step" id="step-4"><div class="pipe-dot">05</div><div class="pipe-text"><div class="pt-name">Agente Verificador</div><div class="pt-desc">Comprueba que preguntas están en los documentos</div></div><div class="pipe-status">esperando</div></div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════ EVALUATION SCREEN ════════════════════════════ -->
+<!-- ── EVALUATION ── -->
 <div id="evaluation" class="screen">
   <div class="header">
     <div class="logo">🎙</div>
     <span class="logo-text">Evaluador <span>Oral</span> IA</span>
     <span id="evalHeaderInfo" class="header-sub"></span>
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀ Modo claro</button>
   </div>
-
   <div class="eval-inner">
     <div class="eval-progress">
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-label" id="progressLabel">0 / 0</div>
     </div>
-
     <div class="question-card" id="questionCard">
       <div class="q-meta">
         <span class="q-num" id="qNum">Pregunta 1</span>
         <span class="q-agent-badge" id="qAgent">agente analizador</span>
       </div>
-      <div class="q-text" id="qText">Cargando pregunta…</div>
+      <div class="q-text" id="qText">Cargando pregunta...</div>
     </div>
-
-    <div style="display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">
-      <button class="tts-btn" id="ttsBtn" onclick="speakQuestion()">
-        <span>🔊</span> Escuchar pregunta
-      </button>
+    <div class="rec-indicator" id="recIndicator">
+      <span class="rec-dot"></span>
+      <span>Grabando</span>
+      <span class="rec-timer" id="recTimer">0:00</span>
     </div>
-
     <div class="answer-zone">
       <label>Transcripción de tu respuesta</label>
       <div class="transcript-box" id="transcriptBox">
-        <span class="transcript-placeholder" id="transcriptPlaceholder">Tu respuesta aparecerá aquí…</span>
+        <span class="transcript-placeholder" id="transcriptPlaceholder">Tu respuesta aparecerá aquí...</span>
       </div>
     </div>
-
+    <div class="confirm-overlay" id="confirmOverlay">
+      <p>No has grabado ninguna respuesta. ¿Seguro que quieres continuar sin responder?</p>
+      <div class="confirm-row">
+        <button class="conf-btn danger" onclick="confirmNext()">Continuar sin responder</button>
+        <button class="conf-btn" onclick="cancelNext()">Volver a grabar</button>
+      </div>
+    </div>
     <div class="controls-row">
-      <button class="rec-btn start" id="recStartBtn" onclick="startRecording()">
-        <span>⏺</span> Grabar respuesta
-      </button>
-      <button class="rec-btn stop hidden" id="recStopBtn" onclick="stopRecording()">
-        <span>⏹</span> Detener grabación
-      </button>
-      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
-        Siguiente <span>→</span>
-      </button>
+      <button class="rec-btn start" id="recStartBtn" onclick="startRecording()"><span>⏺</span> Grabar respuesta</button>
+      <button class="rec-btn stop hidden" id="recStopBtn" onclick="stopRecording()"><span>⏹</span> Detener grabación</button>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Siguiente -></button>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════ RESULTS SCREEN ════════════════════════════ -->
+<!-- ── RESULTS ── -->
 <div id="results" class="screen">
   <div class="header">
     <div class="logo">🎙</div>
     <span class="logo-text">Evaluador <span>Oral</span> IA</span>
     <span class="header-sub">resultados finales</span>
   </div>
-
   <div class="results-inner">
     <div class="results-hero">
       <div class="score-ring">
-        <svg viewBox="0 0 120 120">
-          <circle class="ring-bg" cx="60" cy="60" r="52"/>
-          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
-        </svg>
-        <div class="score-num" id="scoreNum">–</div>
+        <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg>
+        <div class="score-num" id="scoreNum">-</div>
       </div>
       <h2>Evaluación completada</h2>
       <p id="resultsSubtitle">Resumen de la sesión oral</p>
     </div>
-
     <div class="summary-grid" id="summaryGrid"></div>
-
     <div style="margin-bottom:1rem;">
-      <div class="section-title" style="color:var(--text3);font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;">Preguntas y respuestas</div>
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;">Preguntas y respuestas</div>
       <div class="qa-list" id="qaList"></div>
     </div>
-
     <div class="export-row">
-      <button class="export-btn sheets" id="sheetsBtn" onclick="saveToSheets()">📊 Guardar en Google Sheets</button>
-      <button class="export-btn primary" onclick="exportJSON()">⬇ Exportar JSON</button>
-      <button class="export-btn" onclick="exportCSV()">⬇ Exportar CSV</button>
-      <button class="export-btn" onclick="goToSetup()">↩ Nueva evaluación</button>
+      <button class="export-btn sheets hidden" id="sheetsBtn" onclick="saveToSheets()">Reintentar guardar en Sheets</button>
+      <button class="export-btn primary" onclick="exportJSON()">Exportar JSON</button>
+      <button class="export-btn" onclick="exportCSV()">Exportar CSV</button>
+      <button class="export-btn" onclick="goToSetup()">Nueva evaluación</button>
     </div>
     <div id="sheetsStatus"></div>
+
+    <div class="fraud-section" id="fraudSection" style="display:none">
+      <div class="fraud-header" onclick="document.getElementById('fraudBody').classList.toggle('hidden')">
+        <h3>Informe de integridad academica</h3>
+        <button class="fraud-toggle-btn">mostrar / ocultar</button>
+      </div>
+      <div id="fraudBody">
+        <div class="fraud-grid" id="fraudGrid"></div>
+        <div style="margin-bottom:.75rem">
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Indice de sospecha global</div>
+          <div class="suspicion-bar"><div class="suspicion-fill" id="suspicionFill"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--text3)"><span>Baja</span><span id="suspicionPct">0%</span><span>Alta</span></div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Por pregunta</div>
+        <div class="fraud-per-q" id="fraudPerQ"></div>
+        <p style="font-size:11px;color:var(--text3);margin-top:1rem;font-family:var(--mono)">Nota: este informe es orientativo. Los indicadores de sospecha son señales estadisticas, no pruebas de deshonestidad academica. Deben interpretarse junto con el contexto de la evaluacion.</p>
+      </div>
+    </div>
   </div>
 </div>
 
-</div><!-- /.app -->
+</div>
 <div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════════
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyBM-7Sg0QKvQbyt9e6V3Fa5n57RZcy0s7O9VxGmnzRGywAF110HR34N4FN9Y7sv2fO/exec';
 
+const PROMPT_EXAMPLES = [
+  'Enf\u00f3cate en interpretaci\u00f3n cl\u00ednica y aplicaci\u00f3n pr\u00e1ctica. Evita preguntas sobre sintaxis de c\u00f3digo.',
+  'Usa un tono socr\u00e1tico: no des pistas en las preguntas. Pregunta siempre "\u00bfpor qu\u00e9?" y "\u00bfen qu\u00e9 contexto?".',
+  'Pregunta siempre por alternativas posibles, limitaciones del m\u00e9todo y posibles fuentes de error.'
+];
+
 const state = {
-  apiKey: '',
-  studentName: '',
-  subject: '',
-  numQuestions: 8,
-  difficulty: 'Intermedio',
-  customPrompt: '',
-  files: [],
-  questions: [],
-  rubrics: [],
-  answers: [],
-  feedbacks: [],
-  currentQ: 0,
-  transcript: '',
-  startTime: null,
-  endTime: null,
-  finalScore: null
+  apiKey: '', selectedModel: 'gpt-4o-mini',
+  studentName: '', subject: '', numQuestions: 8, difficulty: 'Intermedio', customPrompt: '',
+  files: [], questions: [], rubrics: [], answers: [], feedbacks: [],
+  currentQ: 0, transcript: '', startTime: null, endTime: null, finalScore: null,
+  _sheetsResult: null,
+  fraudSignals: []   // one entry per question
 };
 
 let recognition = null;
-let synth = window.speechSynthesis;
+let recTimerInterval = null;
+let recSeconds = 0;
+let lightMode = false;
 
-// ══════════════════════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════════════════════
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  // Restore API key from sessionStorage
+  const savedKey = sessionStorage.getItem('eval_apikey');
+  if (savedKey) document.getElementById('apiKey').value = savedKey;
+  const savedModel = sessionStorage.getItem('eval_model');
+  if (savedModel) document.getElementById('modelSelect').value = savedModel;
+  // Check for saved session
+  checkSavedSession();
+});
+
+// ── THEME ──
+function toggleTheme() {
+  lightMode = !lightMode;
+  document.body.classList.toggle('light', lightMode);
+  document.getElementById('themeBtn').textContent = lightMode ? '🌙 Modo oscuro' : '☀ Modo claro';
+}
+
+// ── COLLAPSIBLE SECTION ──
+function toggleSection(bodyId, arrowId) {
+  const body = document.getElementById(bodyId);
+  const arrow = document.getElementById(arrowId);
+  const collapsed = body.classList.toggle('collapsed');
+  arrow.textContent = collapsed ? '▼' : '▲';
+  if (!body.style.maxHeight || body.style.maxHeight === '0px') {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    body.style.opacity = '1';
+  } else {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => { body.style.maxHeight = '0px'; body.style.opacity = '0'; });
+  }
+}
+// Init section open
+window.addEventListener('DOMContentLoaded', () => {
+  const b = document.getElementById('profesorBody');
+  b.style.maxHeight = b.scrollHeight + 'px';
+  b.style.opacity = '1';
+});
+
+// ── NAVIGATION ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function goToSetup() {
+  clearSession();
   state.questions = []; state.answers = []; state.feedbacks = [];
-  state.currentQ = 0; state.transcript = '';
+  state.currentQ = 0; state.transcript = ''; state.finalScore = null; state._sheetsResult = null;
+  const btn = document.getElementById('startBtn');
+  btn.disabled = false;
+  document.getElementById('startBtnText').textContent = 'Iniciar Evaluacion Oral';
+  document.getElementById('startBtnSpinner').classList.add('hidden');
   showScreen('setup');
 }
 
-// ══════════════════════════════════════════════════════
-// UI HELPERS
-// ══════════════════════════════════════════════════════
+// ── TOAST ──
 function toast(msg, dur = 3000) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -788,30 +614,40 @@ function toast(msg, dur = 3000) {
   setTimeout(() => t.classList.remove('visible'), dur);
 }
 
+// ── FIELD VALIDATION ──
+function validateField(id) {
+  const el = document.getElementById(id);
+  const err = document.getElementById('err-' + id);
+  const empty = !el.value.trim();
+  el.classList.toggle('invalid', empty);
+  err.classList.toggle('visible', empty);
+  return !empty;
+}
+
+// ── API TOGGLE ──
 function toggleApiVis() {
   const inp = document.getElementById('apiKey');
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
+// ── SUBJECT & PROMPT ──
 function setSubject(name) {
   document.getElementById('subjectInput').value = name;
-  document.querySelectorAll('.subject-badge').forEach(b => {
-    b.classList.toggle('selected', b.textContent === name);
-  });
+  document.querySelectorAll('.subject-badge').forEach(b => b.classList.toggle('selected', b.textContent === name));
+  validateField('subjectInput');
 }
 
-// ══════════════════════════════════════════════════════
-// FILE HANDLING
-// ══════════════════════════════════════════════════════
-document.getElementById('fileInput').addEventListener('change', e => {
-  Array.from(e.target.files).forEach(addFile);
-});
-const zone = document.getElementById('uploadZone');
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-zone.addEventListener('drop', e => {
-  e.preventDefault(); zone.classList.remove('drag-over');
-  Array.from(e.dataTransfer.files).forEach(addFile);
+function setPromptEx(i) {
+  document.getElementById('customPrompt').value = PROMPT_EXAMPLES[i];
+}
+
+// ── FILES ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('fileInput').addEventListener('change', e => Array.from(e.target.files).forEach(addFile));
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); Array.from(e.dataTransfer.files).forEach(addFile); });
 });
 
 function addFile(file) {
@@ -819,46 +655,34 @@ function addFile(file) {
   state.files.push(file);
   renderFileList();
 }
-
 function removeFile(name) {
   state.files = state.files.filter(f => f.name !== name);
   renderFileList();
 }
-
 function renderFileList() {
-  const list = document.getElementById('fileList');
-  list.innerHTML = state.files.map(f => `
+  document.getElementById('fileList').innerHTML = state.files.map(f => `
     <div class="file-item">
-      <div class="fi-icon">${getExt(f.name)}</div>
-      <span class="fi-name">${f.name}</span>
-      <span class="fi-size">${(f.size/1024).toFixed(1)} KB</span>
-      <button class="fi-rm" onclick="removeFile('${f.name}')">×</button>
-    </div>
-  `).join('');
+      <div class="fi-icon">${getExt(f.name)}<\/div>
+      <span class="fi-name">${f.name}<\/span>
+      <span class="fi-size">${(f.size/1024).toFixed(1)} KB<\/span>
+      <button class="fi-rm" onclick="removeFile('${f.name.replace(/'/g,"\\'")}')">x<\/button>
+    <\/div>`).join('');
 }
-
-function getExt(name) {
-  return name.split('.').pop().toUpperCase().slice(0,3);
-}
+function getExt(name) { return name.split('.').pop().toUpperCase().slice(0,3); }
 
 async function readFileContent(file) {
-  return new Promise((res, rej) => {
+  return new Promise(res => {
     const r = new FileReader();
     r.onload = e => {
       let text = e.target.result;
       if (file.name.endsWith('.ipynb')) {
         try {
           const nb = JSON.parse(text);
-          const cells = nb.cells || [];
-          text = cells.map(c => {
+          text = (nb.cells || []).map(c => {
             const src = Array.isArray(c.source) ? c.source.join('') : c.source;
             if (c.cell_type === 'markdown') return `[MARKDOWN] ${src}`;
             if (c.cell_type === 'code') {
-              const out = (c.outputs||[]).map(o => {
-                if (o.text) return Array.isArray(o.text) ? o.text.join('') : o.text;
-                if (o.data && o.data['text/plain']) return o.data['text/plain'].join ? o.data['text/plain'].join('') : o.data['text/plain'];
-                return '';
-              }).filter(Boolean).join('\n');
+              const out = (c.outputs||[]).map(o => o.text ? (Array.isArray(o.text)?o.text.join(''):o.text) : (o.data&&o.data['text/plain']?o.data['text/plain'].join?o.data['text/plain'].join(''):o.data['text/plain']:'')).filter(Boolean).join('\n');
               return `[CODE]\n${src}\n[OUTPUT]\n${out}`;
             }
             return src;
@@ -872,27 +696,66 @@ async function readFileContent(file) {
   });
 }
 
-// ══════════════════════════════════════════════════════
-// MULTI-AGENT PIPELINE
-// ══════════════════════════════════════════════════════
-async function callOpenAI(messages, model = 'gpt-4o') {
-  const key = state.apiKey;
-  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${key}`
-    },
-    body: JSON.stringify({ model, messages, temperature: 0.7, max_tokens: 3000 })
-  });
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${resp.status}`);
+// ── SESSION PERSISTENCE ──
+function saveSession() {
+  try {
+    const snap = {
+      studentName: state.studentName, subject: state.subject,
+      numQuestions: state.numQuestions, difficulty: state.difficulty,
+      customPrompt: state.customPrompt, questions: state.questions,
+      rubrics: state.rubrics, answers: state.answers, currentQ: state.currentQ,
+      startTime: state.startTime ? state.startTime.toISOString() : null
+    };
+    sessionStorage.setItem('eval_session', JSON.stringify(snap));
+  } catch(e) {}
+}
+function clearSession() {
+  sessionStorage.removeItem('eval_session');
+}
+function checkSavedSession() {
+  try {
+    const raw = sessionStorage.getItem('eval_session');
+    if (!raw) return;
+    const snap = JSON.parse(raw);
+    if (snap.questions && snap.questions.length > 0 && snap.currentQ < snap.questions.length) {
+      document.getElementById('restoreBanner').classList.add('visible');
+    }
+  } catch(e) {}
+}
+function restoreSession() {
+  try {
+    const snap = JSON.parse(sessionStorage.getItem('eval_session'));
+    Object.assign(state, snap);
+    state.startTime = snap.startTime ? new Date(snap.startTime) : null;
+    state.answers = snap.answers || new Array(snap.questions.length).fill('');
+    state.apiKey = document.getElementById('apiKey').value.trim();
+    state.selectedModel = document.getElementById('modelSelect').value;
+    document.getElementById('restoreBanner').classList.remove('visible');
+    initEvaluation();
+  } catch(e) {
+    toast('No se pudo restaurar la sesi\u00f3n');
+    clearSession();
   }
-  const data = await resp.json();
-  return data.choices[0].message.content;
+}
+function discardSession() {
+  clearSession();
+  document.getElementById('restoreBanner').classList.remove('visible');
 }
 
+// ── OPENAI ──
+async function callOpenAI(messages, model) {
+  const useModel = model || state.selectedModel || 'gpt-4o-mini';
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
+    body: JSON.stringify({ model: useModel, messages, temperature: 0.7, max_tokens: 3000 })
+  });
+  if (!resp.ok) { const err = await resp.json().catch(()=>({})); throw new Error(err.error?.message || `HTTP ${resp.status}`); }
+  return (await resp.json()).choices[0].message.content;
+}
+
+// ── PIPELINE ──
+const STEP_WEIGHTS = [15, 25, 15, 20, 15, 10]; // % of global progress per step (last = save)
 function setStep(idx, status) {
   const step = document.getElementById(`step-${idx}`);
   if (!step) return;
@@ -900,148 +763,110 @@ function setStep(idx, status) {
   if (status === 'active') step.classList.add('active');
   if (status === 'done') step.classList.add('done');
   const s = step.querySelector('.pipe-status');
-  if (s) s.textContent = status === 'active' ? 'procesando...' : status === 'done' ? '✓ listo' : 'esperando';
+  if (s) s.textContent = status === 'active' ? 'procesando...' : status === 'done' ? 'listo' : 'esperando';
   const dot = step.querySelector('.pipe-dot');
-  if (dot && status === 'done') dot.textContent = '✓';
+  if (dot && status === 'done') dot.textContent = 'OK';
+  // Update global progress
+  const done = Array.from({length: 5}, (_,i) => document.getElementById(`step-${i}`)?.classList.contains('done') ? STEP_WEIGHTS[i] : 0).reduce((a,b)=>a+b,0);
+  document.getElementById('globalProgressFill').style.width = Math.min(done, 90) + '%';
+}
+
+function setTimeEstimate(model) {
+  const times = { 'gpt-4o-mini': '~25 s', 'gpt-4o': '~60 s', 'gpt-4-turbo': '~45 s', 'o1-mini': '~90 s' };
+  document.getElementById('timeEstimate').textContent = 'Tiempo estimado: ' + (times[model] || '~30 s');
 }
 
 async function runMultiAgentPipeline(contentContext) {
-  const subject = state.subject;
-  const n = state.numQuestions;
-  const diff = state.difficulty;
-  const extra = state.customPrompt;
+  const { subject, numQuestions: n, difficulty: diff, customPrompt: extra } = state;
 
-  // ── AGENT 1: ANALYZER ──
   setStep(0, 'active');
-  await delay(300);
-  const analyzerPrompt = `Eres el Agente Analizador, experto en ${subject}.
-Tu tarea: analizar el siguiente material/contexto de la asignatura "${subject}" e identificar los ${n > 6 ? Math.ceil(n*1.5) : n+4} conceptos o temas más importantes que un estudiante debe dominar.
-Para cada concepto, indica: nombre del concepto, tipo (teórico/procedimental/aplicado), y relevancia (alta/media).
-
-Material del estudiante:
-${contentContext}
-
-Responde SOLO en JSON válido:
-{"concepts": [{"name": "...", "type": "...", "relevance": "...", "description": "..."}]}`
-
-  const analyzerOut = await callOpenAI([{role:'user', content: analyzerPrompt}]);
+  await delay(200);
+  const analyzerOut = await callOpenAI([{role:'user', content:
+    `Eres el Agente Analizador, experto en ${subject}.
+Analiza el material e identifica los ${n > 6 ? Math.ceil(n*1.5) : n+4} conceptos m\u00e1s importantes.
+Para cada uno indica: nombre, tipo (te\u00f3rico/procedimental/aplicado), relevancia (alta/media).
+Material: ${contentContext}
+Responde SOLO en JSON v\u00e1lido: {"concepts": [{"name":"...","type":"...","relevance":"...","description":"..."}]}`
+  }]);
   let concepts;
-  try {
-    const clean = analyzerOut.replace(/```json|```/g,'').trim();
-    concepts = JSON.parse(clean).concepts;
-  } catch {
-    concepts = [{name: subject, type: 'teórico', relevance: 'alta', description: 'Conceptos generales de la asignatura'}];
-  }
+  try { concepts = JSON.parse(analyzerOut.replace(/```json|```/g,'').trim()).concepts; }
+  catch { concepts = [{name: subject, type: 'te\u00f3rico', relevance: 'alta', description: 'Conceptos generales'}]; }
   setStep(0, 'done');
 
-  // ── AGENT 2: DESIGNER ──
   setStep(1, 'active');
-  await delay(300);
-  const designerPrompt = `Eres el Agente Diseñador de preguntas orales, experto en taxonomía de Bloom y evaluación educativa.
-Asignatura: "${subject}"
-Nivel de dificultad: ${diff}
-Número de preguntas a generar: ${n}
-Instrucciones adicionales del profesor: ${extra || 'ninguna'}
-
-Conceptos clave identificados:
-${JSON.stringify(concepts, null, 2)}
-
-Tu tarea: diseña exactamente ${n} preguntas abiertas para evaluación oral. Cada pregunta debe:
-- Evaluar comprensión profunda, NO memorización
-- Ser clara y específica
-- Incluir el nivel Bloom: (Recordar, Comprender, Aplicar, Analizar, Evaluar, Crear)
-- Estar alineada con el concepto y la dificultad solicitada
-- Invitar a respuestas extensas y reflexivas
-- Variar en tipo: interpretación, relación, aplicación, crítica, síntesis
-
-Responde SOLO en JSON válido:
-{"questions": [{"id": 1, "text": "...", "bloom_level": "...", "concept": "...", "type": "..."}]}`
-
-  const designerOut = await callOpenAI([{role:'user', content: designerPrompt}]);
+  await delay(200);
+  const designerOut = await callOpenAI([{role:'user', content:
+    `Eres el Agente Dise\u00f1ador de preguntas orales, experto en taxonom\u00eda de Bloom.
+Asignatura: "${subject}" | Dificultad: ${diff} | Preguntas: ${n}
+Instrucciones del profesor: ${extra || 'ninguna'}
+Conceptos: ${JSON.stringify(concepts)}
+Dise\u00f1a exactamente ${n} preguntas abiertas que eval\u00faen comprensi\u00f3n profunda, NO memorizaci\u00f3n.
+Cada pregunta debe tener nivel Bloom, ser clara y espec\u00edfica.
+Responde SOLO en JSON v\u00e1lido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"..."}]}`
+  }]);
   let questions;
-  try {
-    const clean = designerOut.replace(/```json|```/g,'').trim();
-    questions = JSON.parse(clean).questions;
-  } catch {
-    throw new Error('El agente diseñador no devolvió preguntas válidas. Revisa tu API key.');
-  }
+  try { questions = JSON.parse(designerOut.replace(/```json|```/g,'').trim()).questions; }
+  catch { throw new Error('El agente dise\u00f1ador no devolvi\u00f3 preguntas v\u00e1lidas. Revisa tu API key.'); }
   setStep(1, 'done');
 
-  // ── AGENT 3: EVALUATOR ──
   setStep(2, 'active');
-  await delay(300);
-  const evalPrompt = `Eres el Agente Evaluador de calidad, experto en didáctica de "${subject}".
-Nivel de dificultad solicitado: ${diff}
-
-Revisa estas ${n} preguntas y ajústalas si es necesario para asegurar:
-1. Coherencia y claridad del lenguaje
-2. Adecuación al nivel ${diff}
-3. Que no haya preguntas repetidas o demasiado similares
-4. Que sean apropiadas para evaluación oral (no requieren escritura)
-
-Preguntas actuales:
-${JSON.stringify(questions, null, 2)}
-
-Devuelve las preguntas mejoradas (o iguales si ya son correctas).
-Responde SOLO en JSON válido:
-{"questions": [{"id": 1, "text": "...", "bloom_level": "...", "concept": "...", "type": "..."}]}`
-
-  const evalOut = await callOpenAI([{role:'user', content: evalPrompt}]);
-  try {
-    const clean = evalOut.replace(/```json|```/g,'').trim();
-    questions = JSON.parse(clean).questions;
-  } catch { /* use previous */ }
+  await delay(200);
+  const evalOut = await callOpenAI([{role:'user', content:
+    `Eres el Agente Evaluador, experto en did\u00e1ctica de "${subject}".
+Revisa estas ${n} preguntas: ajusta al nivel ${diff}, elimina repeticiones, asegura que sean orales.
+Preguntas: ${JSON.stringify(questions)}
+Responde SOLO en JSON v\u00e1lido: {"questions": [{"id":1,"text":"...","bloom_level":"...","concept":"...","type":"..."}]}`
+  }]);
+  try { questions = JSON.parse(evalOut.replace(/```json|```/g,'').trim()).questions; } catch {}
   setStep(2, 'done');
 
-  // ── AGENT 4: FEEDBACK DESIGNER ──
   setStep(3, 'active');
-  await delay(300);
-  const fbPrompt = `Eres el Agente de Retroalimentación, experto en evaluación formativa de "${subject}".
-
-Para cada una de estas ${n} preguntas, crea una rúbrica breve con:
-- Los 3 puntos clave que una respuesta completa debe incluir
-- Un indicador de respuesta excelente vs. respuesta básica
-
-Preguntas:
-${questions.map(q => `${q.id}. ${q.text}`).join('\n')}
-
-Responde SOLO en JSON válido:
-{"rubrics": [{"question_id": 1, "key_points": ["...", "...", "..."], "excellent": "...", "basic": "..."}]}`
-
-  const fbOut = await callOpenAI([{role:'user', content: fbPrompt}]);
+  await delay(200);
+  const fbOut = await callOpenAI([{role:'user', content:
+    `Eres el Agente de Retroalimentaci\u00f3n, experto en evaluaci\u00f3n formativa de "${subject}".
+Para cada pregunta crea una r\u00fabrica con 3 puntos clave y niveles excelente/b\u00e1sico.
+Preguntas: ${questions.map(q=>`${q.id}. ${q.text}`).join('\n')}
+Responde SOLO en JSON v\u00e1lido: {"rubrics":[{"question_id":1,"key_points":["...","...","..."],"excellent":"...","basic":"..."}]}`
+  }]);
   let rubrics = [];
-  try {
-    const clean = fbOut.replace(/```json|```/g,'').trim();
-    rubrics = JSON.parse(clean).rubrics;
-  } catch { 
-    rubrics = questions.map(q => ({
-      question_id: q.id,
-      key_points: ['Concepto correcto', 'Aplicación adecuada', 'Explicación clara'],
-      excellent: 'Respuesta completa con ejemplos', basic: 'Concepto básico correcto'
-    }));
-  }
+  try { rubrics = JSON.parse(fbOut.replace(/```json|```/g,'').trim()).rubrics; }
+  catch { rubrics = questions.map(q=>({question_id:q.id, key_points:['Concepto correcto','Aplicaci\u00f3n adecuada','Explicaci\u00f3n clara'], excellent:'Respuesta completa', basic:'Concepto b\u00e1sico'})); }
   setStep(3, 'done');
+
+  setStep(4, 'active');
+  await delay(200);
+  if (state.files.length > 0) {
+    const verOut = await callOpenAI([{role:'user', content:
+      `Eres el Agente Verificador. Comprueba si cada pregunta est\u00e1 respaldada por el material.
+Material: ${contentContext.slice(0, 6000)}
+Preguntas: ${questions.map(q=>`${q.id}. ${q.text}`).join('\n')}
+Para cada una: "ok" si est\u00e1 en el material, "sustituir" + pregunta alternativa si no lo est\u00e1.
+Responde SOLO en JSON v\u00e1lido: {"verifications":[{"question_id":1,"status":"ok","replacement":null}]}`
+    }]);
+    try {
+      const vs = JSON.parse(verOut.replace(/```json|```/g,'').trim()).verifications || [];
+      vs.forEach(v => { if (v.status==='sustituir' && v.replacement) { const q=questions.find(q=>q.id===v.question_id); if(q) q.text=v.replacement; } });
+    } catch {}
+  }
+  setStep(4, 'done');
 
   return { questions, rubrics };
 }
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ══════════════════════════════════════════════════════
-// START EVALUATION
-// ══════════════════════════════════════════════════════
+// ── START EVALUATION ──
 async function startEvaluation() {
   const apiKey = document.getElementById('apiKey').value.trim();
-  const studentName = document.getElementById('studentName').value.trim();
-  const subject = document.getElementById('subjectInput').value.trim();
-
-  if (!apiKey) { toast('⚠ Introduce tu OpenAI API Key'); return; }
-  if (!studentName) { toast('⚠ Introduce el nombre del estudiante'); return; }
-  if (!subject) { toast('⚠ Introduce la asignatura'); return; }
+  const ok1 = validateField('studentName');
+  const ok2 = validateField('subjectInput');
+  if (!apiKey) { toast('Introduce tu OpenAI API Key'); return; }
+  if (!ok1 || !ok2) { toast('Completa los campos obligatorios'); return; }
 
   state.apiKey = apiKey;
-  state.studentName = studentName;
-  state.subject = subject;
+  state.selectedModel = document.getElementById('modelSelect').value;
+  state.studentName = document.getElementById('studentName').value.trim();
+  state.subject = document.getElementById('subjectInput').value.trim();
   state.numQuestions = parseInt(document.getElementById('numQuestions').value);
   state.difficulty = document.getElementById('difficulty').value;
   state.customPrompt = document.getElementById('customPrompt').value.trim();
@@ -1049,47 +874,46 @@ async function startEvaluation() {
   state.feedbacks = new Array(state.numQuestions).fill('');
   state.startTime = new Date();
 
+  // Persist API key for this session
+  sessionStorage.setItem('eval_apikey', apiKey);
+  sessionStorage.setItem('eval_model', state.selectedModel);
+
   const btn = document.getElementById('startBtn');
   btn.disabled = true;
-  document.getElementById('startBtnText').textContent = 'Procesando…';
+  document.getElementById('startBtnText').textContent = 'Procesando...';
   document.getElementById('startBtnSpinner').classList.remove('hidden');
 
+  setTimeEstimate(state.selectedModel);
   showScreen('loading');
 
-  // Read file contents
-  let contentContext = `Asignatura: ${subject}\nNivel: ${state.difficulty}\n`;
+  let contentContext = `Asignatura: ${state.subject}\nNivel: ${state.difficulty}\n`;
   if (state.files.length > 0) {
     contentContext += '\n--- MATERIAL DEL ESTUDIANTE ---\n';
-    for (const f of state.files) {
-      const content = await readFileContent(f);
-      contentContext += `\n[Archivo: ${f.name}]\n${content}\n`;
-    }
+    for (const f of state.files) { contentContext += `\n[Archivo: ${f.name}]\n${await readFileContent(f)}\n`; }
   } else {
-    contentContext += '\n(No se subieron archivos específicos. Genera preguntas generales sobre la asignatura.)';
+    contentContext += '\n(Sin archivos. Genera preguntas generales sobre la asignatura.)';
   }
 
   try {
     const { questions, rubrics } = await runMultiAgentPipeline(contentContext);
     state.questions = questions;
     state.rubrics = rubrics;
-    await delay(500);
+    saveSession();
+    await delay(400);
     initEvaluation();
   } catch (err) {
-    toast(`❌ Error: ${err.message}`, 6000);
+    toast(`Error: ${err.message}`, 6000);
     btn.disabled = false;
-    document.getElementById('startBtnText').textContent = 'Iniciar Evaluación Oral';
+    document.getElementById('startBtnText').textContent = 'Iniciar Evaluacion Oral';
     document.getElementById('startBtnSpinner').classList.add('hidden');
     showScreen('setup');
   }
 }
 
-// ══════════════════════════════════════════════════════
-// EVALUATION FLOW
-// ══════════════════════════════════════════════════════
+// ── EVALUATION FLOW ──
 function initEvaluation() {
-  state.currentQ = 0;
-  document.getElementById('evalHeaderInfo').textContent =
-    `${state.studentName} · ${state.subject} · ${state.difficulty}`;
+  state.currentQ = state.currentQ || 0;
+  document.getElementById('evalHeaderInfo').textContent = `${state.studentName} \u00b7 ${state.subject} \u00b7 ${state.difficulty}`;
   showScreen('evaluation');
   renderQuestion();
 }
@@ -1098,142 +922,184 @@ function renderQuestion() {
   const idx = state.currentQ;
   const q = state.questions[idx];
   const n = state.questions.length;
-
   document.getElementById('progressFill').style.width = `${(idx / n) * 100}%`;
   document.getElementById('progressLabel').textContent = `${idx + 1} / ${n}`;
   document.getElementById('qNum').textContent = `Pregunta ${idx + 1}`;
   document.getElementById('qAgent').textContent = getAgentLabel(q);
   document.getElementById('qText').textContent = q.text;
-
-  // Reset transcript
-  state.transcript = state.answers[idx] || '';
+  state.transcript = '';
   const box = document.getElementById('transcriptBox');
-  const ph = document.getElementById('transcriptPlaceholder');
-  if (state.transcript) {
-    ph.style.display = 'none';
-    box.childNodes[0] && box.childNodes[0].nodeType === 3 && (box.childNodes[0].textContent = state.transcript);
-    if (!box.querySelector('.answer-text')) {
-      const span = document.createElement('span');
-      span.className = 'answer-text';
-      span.textContent = state.transcript;
-      box.appendChild(span);
-    } else {
-      box.querySelector('.answer-text').textContent = state.transcript;
-    }
-  } else {
-    ph.style.display = '';
-    const at = box.querySelector('.answer-text');
-    if (at) at.remove();
-  }
-
+  box.classList.remove('listening');
+  box.innerHTML = '<span class="transcript-placeholder" id="transcriptPlaceholder">Tu respuesta aparecer\u00e1 aqu\u00ed...<\/span>';
   document.getElementById('recStartBtn').classList.remove('hidden');
+  document.getElementById('recStopBtn').classList.remove('active');
   document.getElementById('recStopBtn').classList.add('hidden');
-  document.getElementById('ttsBtn').classList.remove('speaking');
-
-  const nextBtn = document.getElementById('nextBtn');
-  nextBtn.textContent = idx === n - 1 ? 'Finalizar evaluación →' : 'Siguiente →';
+  document.getElementById('recIndicator').classList.remove('active');
+  document.getElementById('confirmOverlay').classList.remove('visible');
+  stopRecTimer();
+  document.getElementById('nextBtn').textContent = idx === n - 1 ? 'Finalizar evaluacion ->' : 'Siguiente ->';
+  // Track when question was shown for latency measurement
+  state._questionShownAt = Date.now();
+  state._interimCount = 0;
+  state._finalCount = 0;
 }
 
 function getAgentLabel(q) {
-  const labels = {
-    'Recordar': 'agente analizador', 'Comprender': 'agente analizador',
-    'Aplicar': 'agente diseñador', 'Analizar': 'agente diseñador',
-    'Evaluar': 'agente evaluador', 'Crear': 'agente retroalimentador'
-  };
-  return labels[q.bloom_level] || 'agente diseñador';
+  return {'Recordar':'agente analizador','Comprender':'agente analizador','Aplicar':'agente disenyador','Analizar':'agente disenyador','Evaluar':'agente evaluador','Crear':'agente retroalimentador'}[q.bloom_level] || 'agente disenyador';
 }
 
-// ── TTS ──
-function speakQuestion() {
-  if (!synth) { toast('TTS no disponible en este navegador'); return; }
-  synth.cancel();
-  const q = state.questions[state.currentQ];
-  const utt = new SpeechSynthesisUtterance(q.text);
-  utt.lang = 'es-ES'; utt.rate = 0.9;
-  const btn = document.getElementById('ttsBtn');
-  utt.onstart = () => btn.classList.add('speaking');
-  utt.onend = () => btn.classList.remove('speaking');
-  utt.onerror = () => btn.classList.remove('speaking');
-  synth.speak(utt);
+// ── REC TIMER ──
+function startRecTimer() {
+  recSeconds = 0;
+  document.getElementById('recTimer').textContent = '0:00';
+  document.getElementById('recIndicator').classList.add('active');
+  recTimerInterval = setInterval(() => {
+    recSeconds++;
+    const m = Math.floor(recSeconds / 60);
+    const s = String(recSeconds % 60).padStart(2, '0');
+    document.getElementById('recTimer').textContent = `${m}:${s}`;
+  }, 1000);
+}
+function stopRecTimer() {
+  clearInterval(recTimerInterval);
+  recTimerInterval = null;
+  document.getElementById('recIndicator').classList.remove('active');
 }
 
-// ── SPEECH RECOGNITION ──
+// ── RECORDING ──
 function startRecording() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    toast('⚠ Grabación no soportada. Puedes escribir tu respuesta.');
-    makeTranscriptEditable();
-    return;
-  }
+  if (!SpeechRecognition) { toast('Grabacion no soportada. Puedes escribir tu respuesta.'); makeTranscriptEditable(); return; }
+  if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
 
-  recognition = new SpeechRecognition();
-  recognition.lang = 'es-ES';
-  recognition.continuous = true;
-  recognition.interimResults = true;
+  const rec = new SpeechRecognition();
+  rec.lang = 'es-ES'; rec.continuous = true; rec.interimResults = true;
+  recognition = rec;
 
   const box = document.getElementById('transcriptBox');
-  const ph = document.getElementById('transcriptPlaceholder');
-  ph.style.display = 'none';
+  box.innerHTML = '';
   box.classList.add('listening');
+  let finalText = '';
+  let active = true;
+  // Fraud: record latency from question shown to rec start
+  const recStartLatency = state._questionShownAt ? (Date.now() - state._questionShownAt) : null;
+  let interimTokens = 0;
+  let finalTokens = 0;
+  let speechChunks = [];
+  let lastChunkTime = Date.now();
 
-  let finalText = state.answers[state.currentQ] || '';
-
-  recognition.onresult = e => {
+  rec.onresult = e => {
+    if (!active) return;
     let interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) finalText += e.results[i][0].transcript + ' ';
-      else interim += e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        finalText += e.results[i][0].transcript + ' ';
+        finalTokens += e.results[i][0].transcript.split(/\s+/).filter(Boolean).length;
+        const now = Date.now();
+        speechChunks.push(now - lastChunkTime);
+        lastChunkTime = now;
+      } else {
+        interim += e.results[i][0].transcript;
+        interimTokens += e.results[i][0].transcript.split(/\s+/).filter(Boolean).length;
+      }
     }
     box.innerHTML = '';
     if (finalText) { const s = document.createElement('span'); s.textContent = finalText; box.appendChild(s); }
     if (interim) { const s = document.createElement('span'); s.className = 'interim-text'; s.textContent = interim; box.appendChild(s); }
     state.transcript = finalText;
+    // Update fraud signals in real time
+    state.fraudSignals[state.currentQ] = {
+      latencyMs: recStartLatency,
+      recDurationSec: recSeconds,
+      wordCount: finalText.trim().split(/\s+/).filter(Boolean).length,
+      wpm: recSeconds > 0 ? Math.round(finalText.trim().split(/\s+/).filter(Boolean).length / (recSeconds/60)) : 0,
+      fluencyRatio: (finalTokens + interimTokens) > 0 ? Math.round(finalTokens/(finalTokens+interimTokens)*100) : 0,
+      chunkVarianceMs: speechChunks.length > 1 ? Math.round(Math.sqrt(speechChunks.map(c=>Math.pow(c-speechChunks.reduce((a,b)=>a+b,0)/speechChunks.length,2)).reduce((a,b)=>a+b,0)/speechChunks.length)) : 0,
+      transcript: finalText
+    };
   };
 
-  recognition.onend = () => {
+  rec.onend = () => {
+    if (!active) return;
+    active = false;
     box.classList.remove('listening');
-    state.answers[state.currentQ] = state.transcript;
+    stopRecTimer();
+    if (recognition === rec) {
+      recognition = null;
+      state.answers[state.currentQ] = state.transcript;
+      document.getElementById('recStartBtn').classList.remove('hidden');
+      document.getElementById('recStopBtn').classList.add('hidden');
+      document.getElementById('recStopBtn').classList.remove('active');
+      if (!state.transcript) box.innerHTML = '<span class="transcript-placeholder" id="transcriptPlaceholder">Tu respuesta aparecer\u00e1 aqu\u00ed...<\/span>';
+    }
   };
 
-  recognition.onerror = (e) => {
-    box.classList.remove('listening');
-    if (e.error !== 'aborted') toast(`Error de grabación: ${e.error}`);
-  };
+  rec.onerror = e => { if (!active) return; if (e.error !== 'aborted' && e.error !== 'no-speech') toast(`Error de grabacion: ${e.error}`); };
 
-  recognition.start();
+  state._recStartedAt = Date.now();
+  rec.start();
+  startRecTimer();
   document.getElementById('recStartBtn').classList.add('hidden');
   document.getElementById('recStopBtn').classList.remove('hidden');
   document.getElementById('recStopBtn').classList.add('active');
 }
 
 function stopRecording() {
-  if (recognition) { recognition.stop(); recognition = null; }
+  const rec = recognition;
+  recognition = null;
+  if (rec) { try { rec.stop(); } catch(e){} }
   state.answers[state.currentQ] = state.transcript;
+  // Store basic fraud signals (linguistic analysis done later by agent)
+  if (!state.fraudSignals[state.currentQ]) {
+    state.fraudSignals[state.currentQ] = {
+      latencyMs: state._questionShownAt ? (state._recStartedAt||Date.now()) - state._questionShownAt : null,
+      recDurationSec: recSeconds,
+      wordCount: (state.transcript||'').trim().split(/\s+/).filter(Boolean).length,
+      wpm: recSeconds > 0 ? Math.round((state.transcript||'').trim().split(/\s+/).filter(Boolean).length / (recSeconds/60)) : 0,
+      fluencyRatio: 88, chunkVarianceMs: 300, transcript: state.transcript||''
+    };
+  }
+  stopRecTimer();
+  const box = document.getElementById('transcriptBox');
+  box.classList.remove('listening');
   document.getElementById('recStartBtn').classList.remove('hidden');
   document.getElementById('recStopBtn').classList.add('hidden');
   document.getElementById('recStopBtn').classList.remove('active');
-  document.getElementById('transcriptBox').classList.remove('listening');
-
-  const ph = document.getElementById('transcriptPlaceholder');
-  if (!state.transcript) ph.style.display = '';
+  if (!state.transcript) box.innerHTML = '<span class="transcript-placeholder" id="transcriptPlaceholder">Tu respuesta aparecer\u00e1 aqu\u00ed...<\/span>';
 }
 
 function makeTranscriptEditable() {
   const box = document.getElementById('transcriptBox');
-  box.contentEditable = 'true';
-  box.style.cursor = 'text';
-  box.focus();
-  box.addEventListener('input', () => {
-    state.transcript = box.textContent;
-    state.answers[state.currentQ] = state.transcript;
-  });
+  box.contentEditable = 'true'; box.style.cursor = 'text'; box.focus();
+  box.addEventListener('input', () => { state.transcript = box.textContent; state.answers[state.currentQ] = state.transcript; });
 }
 
+// ── NEXT / CONFIRM ──
 async function nextQuestion() {
-  if (recognition) { recognition.stop(); recognition = null; }
-  synth.cancel();
+  if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
+  stopRecTimer();
   state.answers[state.currentQ] = state.transcript || state.answers[state.currentQ];
 
+  // Confirm if no answer
+  if (!state.answers[state.currentQ] || !state.answers[state.currentQ].trim()) {
+    document.getElementById('confirmOverlay').classList.add('visible');
+    return;
+  }
+  saveSession();
+  await doNextOrFinish();
+}
+
+async function confirmNext() {
+  document.getElementById('confirmOverlay').classList.remove('visible');
+  saveSession();
+  await doNextOrFinish();
+}
+
+function cancelNext() {
+  document.getElementById('confirmOverlay').classList.remove('visible');
+}
+
+async function doNextOrFinish() {
   if (state.currentQ === state.questions.length - 1) {
     await finishEvaluation();
   } else {
@@ -1242,77 +1108,71 @@ async function nextQuestion() {
   }
 }
 
-// ══════════════════════════════════════════════════════
-// FINISH & EVALUATE
-// ══════════════════════════════════════════════════════
+// ── FINISH & EVALUATE ──
 async function finishEvaluation() {
   state.endTime = new Date();
+  clearSession();
   showScreen('loading');
+  for (let i = 0; i < 5; i++) setStep(i, 'waiting');
 
-  // Reset pipeline visuals
-  for (let i = 0; i < 4; i++) setStep(i, 'waiting');
-
-  // Use step 0 for feedback generation
-  setStep(0, 'active');
-  document.querySelector('#step-0 .pt-name').textContent = 'Generando retroalimentación';
-  document.querySelector('#step-0 .pt-desc').textContent = 'Evaluando cada respuesta con la rúbrica diseñada';
+  // Reuse loading screen for feedback phase
   document.querySelector('#loading h2').textContent = 'Evaluando respuestas';
-  document.querySelector('#loading > div > p').textContent = 'El agente evaluador analiza tus respuestas…';
+  document.querySelector('#loading #loadingDesc').textContent = 'El agente evaluador analiza cada respuesta...';
+  document.getElementById('globalProgressFill').style.width = '5%';
+  setStep(0, 'active');
+  document.querySelector('#step-0 .pt-name').textContent = 'Evaluando respuestas';
+  document.querySelector('#step-0 .pt-desc').textContent = 'Puntuando y generando retroalimentacion por pregunta';
 
   try {
     const feedbackResults = [];
     let totalScore = 0;
-
     for (let i = 0; i < state.questions.length; i++) {
       const q = state.questions[i];
       const ans = state.answers[i] || '(Sin respuesta)';
       const rubric = state.rubrics[i] || {};
-
-      const fbPrompt = `Eres un evaluador experto en "${state.subject}".
+      try {
+        const out = await callOpenAI([{role:'user', content:
+          `Eres un evaluador experto en "${state.subject}".
 Pregunta: ${q.text}
 Respuesta del estudiante: ${ans}
-Criterios de evaluación:
-- Puntos clave esperados: ${(rubric.key_points || []).join('; ')}
-- Respuesta excelente: ${rubric.excellent || ''}
-- Respuesta básica: ${rubric.basic || ''}
-
-Evalúa la respuesta y proporciona:
-1. Una puntuación del 0 al 10
-2. Retroalimentación constructiva en 2-3 frases
-3. Qué hizo bien (si algo)
-4. Qué mejorar (si algo)
-
-Responde SOLO en JSON válido:
-{"score": 7, "feedback": "...", "strengths": "...", "improvements": "..."}`;
-
-      try {
-        const out = await callOpenAI([{role:'user', content: fbPrompt}], 'gpt-4o-mini');
-        const clean = out.replace(/```json|```/g,'').trim();
-        const parsed = JSON.parse(clean);
+Puntos clave: ${(rubric.key_points||[]).join('; ')}
+Respuesta excelente esperada: ${rubric.excellent||''}
+Eval\u00faa y devuelve SOLO JSON v\u00e1lido:
+{"score":7,"feedback":"...","strengths":"...","improvements":"..."}`
+        }]);
+        const parsed = JSON.parse(out.replace(/```json|```/g,'').trim());
         feedbackResults.push(parsed);
         totalScore += parsed.score || 0;
       } catch {
-        feedbackResults.push({ score: 5, feedback: 'No se pudo evaluar automáticamente.', strengths: '', improvements: '' });
+        feedbackResults.push({score:5, feedback:'No se pudo evaluar.', strengths:'', improvements:''});
         totalScore += 5;
       }
+      document.getElementById('globalProgressFill').style.width = (5 + Math.round((i+1)/state.questions.length * 80)) + '%';
     }
-
     state.feedbacks = feedbackResults;
     state.finalScore = Math.round(totalScore / state.questions.length * 10) / 10;
     setStep(0, 'done');
 
-    // ── Step 1: auto-save to Google Sheets ──
+    // ── FRAUD ANALYSIS ──
     setStep(1, 'active');
-    document.querySelector('#step-1 .pt-name').textContent = 'Guardando en Google Sheets';
-    document.querySelector('#step-1 .pt-desc').textContent = 'Enviando resultados completos a la hoja de cálculo';
-    await delay(300);
-    await autoSaveToSheets();
+    document.querySelector('#step-1 .pt-name').textContent = 'Agente de integridad';
+    document.querySelector('#step-1 .pt-desc').textContent = 'Analizando patrones de habla y señales de fraude';
+    await runFraudAnalysis();
     setStep(1, 'done');
+
+    // Auto-save
+    setStep(2, 'active');
+    document.querySelector('#step-2 .pt-name').textContent = 'Guardando en Google Sheets';
+    document.querySelector('#step-2 .pt-desc').textContent = 'Enviando resultados completos';
+    await autoSaveToSheets();
+    setStep(2, 'done');
+    document.getElementById('globalProgressFill').style.width = '100%';
 
     await delay(400);
     renderResults();
+    postRenderResults();
     showScreen('results');
-  } catch (err) {
+  } catch(err) {
     toast(`Error al evaluar: ${err.message}`, 5000);
     showScreen('evaluation');
     state.currentQ = state.questions.length - 1;
@@ -1320,236 +1180,337 @@ Responde SOLO en JSON válido:
   }
 }
 
-// ══════════════════════════════════════════════════════
-// RESULTS
-// ══════════════════════════════════════════════════════
+// ── RESULTS ──
 function renderResults() {
   const score = state.finalScore;
   const n = state.questions.length;
   const answered = state.answers.filter(a => a && a.trim()).length;
-  const duration = state.endTime && state.startTime ?
-    Math.round((state.endTime - state.startTime) / 60000) : 0;
+  const duration = state.endTime && state.startTime ? Math.round((state.endTime - state.startTime) / 60000) : 0;
 
-  document.getElementById('resultsSubtitle').textContent =
-    `${state.studentName} · ${state.subject} · ${state.difficulty}`;
+  document.getElementById('resultsSubtitle').textContent = `${state.studentName} \u00b7 ${state.subject} \u00b7 ${state.difficulty}`;
   document.getElementById('scoreNum').textContent = score.toFixed(1);
-
-  const perc = score / 10;
   const circ = 326.7;
   setTimeout(() => {
-    document.getElementById('ringFill').style.strokeDashoffset = circ * (1 - perc);
-    const col = score >= 7 ? '#4ade80' : score >= 5 ? '#fbbf24' : '#ff6b6b';
-    document.getElementById('ringFill').style.stroke = col;
+    const fill = document.getElementById('ringFill');
+    fill.style.strokeDashoffset = circ * (1 - score / 10);
+    fill.style.stroke = score >= 7 ? '#4ade80' : score >= 5 ? '#fbbf24' : '#ff6b6b';
   }, 300);
 
   document.getElementById('summaryGrid').innerHTML = `
-    <div class="stat-card"><div class="sc-label">Puntuación final</div><div class="sc-value" style="color:var(--accent)">${score.toFixed(1)}/10</div></div>
-    <div class="stat-card"><div class="sc-label">Preguntas respondidas</div><div class="sc-value">${answered}/${n}</div></div>
-    <div class="stat-card"><div class="sc-label">Duración (min)</div><div class="sc-value">${duration}</div></div>
-    <div class="stat-card"><div class="sc-label">Dificultad</div><div class="sc-value" style="font-size:1rem">${state.difficulty}</div></div>
-  `;
+    <div class="stat-card"><div class="sc-label">Puntuaci\u00f3n final<\/div><div class="sc-value" style="color:var(--accent)">${score.toFixed(1)}\/10<\/div><\/div>
+    <div class="stat-card"><div class="sc-label">Respondidas<\/div><div class="sc-value">${answered}\/${n}<\/div><\/div>
+    <div class="stat-card"><div class="sc-label">Duraci\u00f3n (min)<\/div><div class="sc-value">${duration}<\/div><\/div>
+    <div class="stat-card"><div class="sc-label">Dificultad<\/div><div class="sc-value" style="font-size:1rem">${state.difficulty}<\/div><\/div>`;
 
-  // ── Mostrar resultado del guardado automático ──
+  // Sheets button: hide if saved OK, show as retry if failed
   const r = state._sheetsResult;
-  const btn = document.getElementById('sheetsBtn');
-  if (r && (r.status === 'ok' || r.status === undefined)) {
-    btn.innerHTML = '✓ Guardado en Google Sheets';
-    btn.classList.add('saved'); btn.disabled = true;
-    const sheetUrl = r.sheetUrl || '';
-    showSheetsStatus('ok',
-      `✓ Evaluación guardada automáticamente en Google Sheets.${sheetUrl ? ` <a href="${sheetUrl}" target="_blank">Abrir hoja →</a>` : ''}`
-    );
+  const sheetsBtn = document.getElementById('sheetsBtn');
+  if (r && r.status === 'ok') {
+    sheetsBtn.classList.add('hidden');
+    showSheetsStatus('ok', 'Evaluacion guardada automaticamente en Google Sheets.');
   } else if (r && r.status === 'error') {
-    btn.innerHTML = '📊 Reintentar guardar';
-    showSheetsStatus('err', `⚠ El guardado automático falló: ${r.message || 'error desconocido'}. Puedes reintentarlo con el botón.`);
+    sheetsBtn.classList.remove('hidden');
+    showSheetsStatus('err', `El guardado autom\u00e1tico fall\u00f3: ${r.message || 'error desconocido'}.`);
   }
 
-  const qaList = document.getElementById('qaList');
-  qaList.innerHTML = state.questions.map((q, i) => {
+  document.getElementById('qaList').innerHTML = state.questions.map((q, i) => {
     const ans = state.answers[i] || '(Sin respuesta)';
     const fb = state.feedbacks[i] || {};
-    const scoreColor = fb.score >= 7 ? 'var(--success)' : fb.score >= 5 ? 'var(--warning)' : 'var(--accent3)';
+    const col = fb.score >= 7 ? 'var(--success)' : fb.score >= 5 ? 'var(--warning)' : 'var(--accent3)';
     return `
     <div class="qa-item" id="qa-${i}">
       <div class="qa-header" onclick="toggleQA(${i})">
-        <span class="qa-qnum">P${i+1}</span>
-        <span class="qa-qtext">${q.text}</span>
-        <span style="font-family:var(--mono);font-size:13px;color:${scoreColor};margin-right:8px;flex-shrink:0">${fb.score ?? '?'}/10</span>
-        <span class="qa-chevron">▼</span>
-      </div>
+        <span class="qa-qnum">P${i+1}<\/span>
+        <span class="qa-qtext">${q.text}<\/span>
+        <span style="font-family:var(--mono);font-size:13px;color:${col};margin-right:8px;flex-shrink:0">${fb.score ?? '?'}\/10<\/span>
+        <span class="qa-chevron">v<\/span>
+      <\/div>
       <div class="qa-body">
-        <p style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px">RESPUESTA DEL ESTUDIANTE</p>
-        <div class="qa-answer">${ans}</div>
+        <p style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px">RESPUESTA<\/p>
+        <div class="qa-answer">${ans}<\/div>
         <div class="qa-feedback">
-          <span class="fb-label">Retroalimentación IA</span>
-          <p>${fb.feedback || ''}</p>
-          ${fb.strengths ? `<p style="margin-top:6px;color:var(--success)">✓ ${fb.strengths}</p>` : ''}
-          ${fb.improvements ? `<p style="margin-top:4px;color:var(--warning)">↑ ${fb.improvements}</p>` : ''}
-        </div>
-      </div>
-    </div>`;
+          <span class="fb-label">Retroalimentacion IA<\/span>
+          <p>${fb.feedback || ''}<\/p>
+          ${fb.strengths ? `<p style="margin-top:6px;color:var(--success)">${fb.strengths}<\/p>` : ''}
+          ${fb.improvements ? `<p style="margin-top:4px;color:var(--warning)">${fb.improvements}<\/p>` : ''}
+        <\/div>
+      <\/div>
+    <\/div>`;
   }).join('');
 }
 
-function toggleQA(idx) {
-  document.getElementById(`qa-${idx}`).classList.toggle('open');
-}
+function toggleQA(idx) { document.getElementById(`qa-${idx}`).classList.toggle('open'); }
 
-// ══════════════════════════════════════════════════════
-// GOOGLE SHEETS INTEGRATION
-// ══════════════════════════════════════════════════════
+// Called after renderResults
+function postRenderResults() { renderFraudReport(); }
 
-/** Construye el payload completo con todos los datos de la evaluación */
+// ── SHEETS ──
 function buildSheetsPayload() {
-  const duration = state.endTime && state.startTime
-    ? Math.round((state.endTime - state.startTime) / 60000) : 0;
-  const fileNames = state.files.map(f => f.name).join('; ') || '(sin archivos)';
+  const duration = state.endTime && state.startTime ? Math.round((state.endTime - state.startTime) / 60000) : 0;
   const qaColumns = {};
   state.questions.forEach((q, i) => {
     const n = i + 1;
-    qaColumns[`Pregunta_${n}`]          = q.text || '';
-    qaColumns[`Bloom_${n}`]             = q.bloom_level || '';
-    qaColumns[`Concepto_${n}`]          = q.concept || '';
-    qaColumns[`Respuesta_${n}`]         = state.answers[i] || '(sin respuesta)';
-    qaColumns[`Nota_${n}`]              = state.feedbacks[i]?.score ?? '';
+    qaColumns[`Pregunta_${n}`] = q.text || '';
+    qaColumns[`Bloom_${n}`] = q.bloom_level || '';
+    qaColumns[`Concepto_${n}`] = q.concept || '';
+    qaColumns[`Respuesta_${n}`] = state.answers[i] || '(sin respuesta)';
+    qaColumns[`Nota_${n}`] = state.feedbacks[i]?.score ?? '';
     qaColumns[`Retroalimentacion_${n}`] = state.feedbacks[i]?.feedback || '';
-    qaColumns[`Fortalezas_${n}`]        = state.feedbacks[i]?.strengths || '';
-    qaColumns[`Mejoras_${n}`]           = state.feedbacks[i]?.improvements || '';
+    qaColumns[`Fortalezas_${n}`] = state.feedbacks[i]?.strengths || '';
+    qaColumns[`Mejoras_${n}`] = state.feedbacks[i]?.improvements || '';
   });
   return {
-    Timestamp:           new Date().toISOString(),
-    Estudiante:          state.studentName,
-    Asignatura:          state.subject,
-    Dificultad:          state.difficulty,
-    Num_Preguntas:       state.numQuestions,
-    Nota_Final:          state.finalScore ?? '',
-    Duracion_Minutos:    duration,
-    Archivos_Materiales: fileNames,
+    Timestamp: new Date().toISOString(), Estudiante: state.studentName,
+    Asignatura: state.subject, Dificultad: state.difficulty,
+    Num_Preguntas: state.numQuestions, Nota_Final: state.finalScore ?? '',
+    Duracion_Minutos: duration, Archivos_Materiales: state.files.map(f=>f.name).join('; ') || '(sin archivos)',
     Instrucciones_Extra: state.customPrompt || '',
-    ...qaColumns
+    Indice_Sospecha_Global: state._fraudReport ? state._fraudReport.globalScore : '',
+    Nivel_Sospecha: state._fraudReport ? state._fraudReport.globalLevel : '',
+    ...qaColumns,
+    ...(state._fraudReport ? state._fraudReport.sheetsColumns : {})
   };
 }
 
-/** Llamada interna: se ejecuta automáticamente al finalizar. No muestra botón. */
 async function autoSaveToSheets() {
   try {
-    const payload = buildSheetsPayload();
     const formData = new URLSearchParams();
-    formData.append('payload', JSON.stringify(payload));
-    const resp = await fetch(GAS_URL, {
-      method: 'POST',
-      body: formData,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
-    let result;
-    try { result = await resp.json(); } catch { result = { status: resp.ok ? 'ok' : 'error' }; }
-    state._sheetsResult = result; // guardamos para mostrarlo en resultados
-  } catch (err) {
-    state._sheetsResult = { status: 'error', message: err.message };
-  }
+    formData.append('payload', JSON.stringify(buildSheetsPayload()));
+    const resp = await fetch(GAS_URL, { method: 'POST', body: formData, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+    let result; try { result = await resp.json(); } catch { result = { status: resp.ok ? 'ok' : 'error' }; }
+    state._sheetsResult = result;
+  } catch(err) { state._sheetsResult = { status: 'error', message: err.message }; }
 }
 
-/** Llamada manual desde el botón de resultados (reintento) */
 async function saveToSheets() {
   const btn = document.getElementById('sheetsBtn');
-  btn.disabled = true;
-  btn.classList.add('saving');
-  btn.innerHTML = '⏳ Guardando…';
-
+  btn.disabled = true; btn.textContent = 'Guardando...';
   try {
-    const payload = buildSheetsPayload();
     const formData = new URLSearchParams();
-    formData.append('payload', JSON.stringify(payload));
-    const resp = await fetch(GAS_URL, {
-      method: 'POST',
-      body: formData,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
-    let result;
-    try { result = await resp.json(); } catch { result = { status: resp.ok ? 'ok' : 'error' }; }
-
+    formData.append('payload', JSON.stringify(buildSheetsPayload()));
+    const resp = await fetch(GAS_URL, { method: 'POST', body: formData, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+    let result; try { result = await resp.json(); } catch { result = { status: resp.ok ? 'ok' : 'error' }; }
     if (result.status === 'ok' || resp.ok) {
-      btn.innerHTML = '✓ Guardado en Sheets';
-      btn.classList.add('saved');
-      btn.classList.remove('saving');
-      const sheetUrl = result.sheetUrl || '';
-      showSheetsStatus('ok',
-        `✓ Guardado correctamente en Google Sheets.${sheetUrl ? ` <a href="${sheetUrl}" target="_blank">Abrir hoja →</a>` : ''}`
-      );
-    } else {
-      throw new Error(result.message || 'Error del servidor.');
-    }
-  } catch (err) {
-    btn.disabled = false;
-    btn.classList.remove('saving');
-    btn.innerHTML = '📊 Reintentar guardar';
-    showSheetsStatus('err', `❌ Error: ${err.message}`);
+      btn.classList.add('hidden');
+      showSheetsStatus('ok', 'Guardado correctamente en Google Sheets.');
+    } else { throw new Error(result.message || 'Error del servidor.'); }
+  } catch(err) {
+    btn.disabled = false; btn.textContent = 'Reintentar guardar en Sheets';
+    showSheetsStatus('err', `Error: ${err.message}`);
   }
 }
 
 function showSheetsStatus(type, html) {
   const el = document.getElementById('sheetsStatus');
-  el.className = type;
-  el.innerHTML = html;
+  el.className = type; el.innerHTML = html;
   el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ══════════════════════════════════════════════════════
-// EXPORT
-// ══════════════════════════════════════════════════════
+// ── EXPORT ──
 function exportJSON() {
-  const data = {
-    timestamp: new Date().toISOString(),
-    student: state.studentName,
-    subject: state.subject,
-    difficulty: state.difficulty,
-    num_questions: state.numQuestions,
-    final_score: state.finalScore,
-    duration_minutes: state.endTime && state.startTime ?
-      Math.round((state.endTime - state.startTime) / 60000) : null,
-    questions: state.questions.map((q, i) => ({
-      id: q.id,
-      text: q.text,
-      bloom_level: q.bloom_level,
-      concept: q.concept,
-      answer: state.answers[i] || '',
-      score: state.feedbacks[i]?.score ?? null,
-      feedback: state.feedbacks[i]?.feedback ?? '',
-      strengths: state.feedbacks[i]?.strengths ?? '',
-      improvements: state.feedbacks[i]?.improvements ?? ''
-    }))
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  downloadBlob(blob, `evaluacion_oral_${state.studentName.replace(/\s+/g,'_')}_${Date.now()}.json`);
+  const data = { timestamp: new Date().toISOString(), student: state.studentName, subject: state.subject, difficulty: state.difficulty, final_score: state.finalScore,
+    questions: state.questions.map((q,i) => ({ id: q.id, text: q.text, bloom_level: q.bloom_level, concept: q.concept, answer: state.answers[i]||'', score: state.feedbacks[i]?.score??null, feedback: state.feedbacks[i]?.feedback??'', strengths: state.feedbacks[i]?.strengths??'', improvements: state.feedbacks[i]?.improvements??'' })) };
+  downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}), `eval_${state.studentName.replace(/\s+/g,'_')}_${Date.now()}.json`);
 }
-
 function exportCSV() {
-  const headers = ['Timestamp','Estudiante','Asignatura','Dificultad','Pregunta','Nivel Bloom','Concepto','Respuesta','Puntuación','Retroalimentación'];
-  const rows = state.questions.map((q, i) => [
-    new Date().toISOString(),
-    state.studentName,
-    state.subject,
-    state.difficulty,
-    `"${(q.text||'').replace(/"/g,'""')}"`,
-    q.bloom_level,
-    q.concept,
-    `"${(state.answers[i]||'').replace(/"/g,'""')}"`,
-    state.feedbacks[i]?.score ?? '',
-    `"${(state.feedbacks[i]?.feedback||'').replace(/"/g,'""')}"`
-  ]);
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-  downloadBlob(blob, `evaluacion_oral_${state.studentName.replace(/\s+/g,'_')}_${Date.now()}.csv`);
+  const hdr = ['Timestamp','Estudiante','Asignatura','Dificultad','Pregunta','Bloom','Concepto','Respuesta','Nota','Retroalimentacion'];
+  const rows = state.questions.map((q,i) => [new Date().toISOString(), state.studentName, state.subject, state.difficulty, `"${(q.text||'').replace(/"/g,'""')}"`, q.bloom_level, q.concept, `"${(state.answers[i]||'').replace(/"/g,'""')}"`, state.feedbacks[i]?.score??'', `"${(state.feedbacks[i]?.feedback||'').replace(/"/g,'""')}"`]);
+  downloadBlob(new Blob([[hdr.join(','),...rows.map(r=>r.join(','))].join('\n')],{type:'text/csv;charset=utf-8;'}), `eval_${state.studentName.replace(/\s+/g,'_')}_${Date.now()}.csv`);
+}
+function downloadBlob(blob, filename) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); toast('Archivo descargado');
 }
 
-function downloadBlob(blob, filename) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast('✓ Archivo descargado');
+// ======================================================
+// FRAUD DETECTION
+// ======================================================
+
+// Thresholds based on research on oral vs read speech
+const FRAUD_THRESHOLDS = {
+  latency:    { low: 8000,  high: 25000  }, // ms: <8s suspicious fast, >25s suspicious slow (consulting)
+  wpm:        { low: 80,    high: 175    }, // words/min: >175 = likely reading
+  fluency:    { low: 60,    high: 88     }, // % final tokens: >88 = reading (too clean)
+  variance:   { low: 200,   high: 1500   }, // ms chunk variance: <200 = robotic uniformity
+  wordCount:  { min: 15                  }  // fewer than 15 words = not evaluated
+};
+
+function scoreFraudSignal(val, lo, hi, higherIsBad) {
+  if (val === null || val === undefined) return 0;
+  if (higherIsBad) {
+    if (val <= lo) return 0;
+    if (val >= hi) return 100;
+    return Math.round((val - lo) / (hi - lo) * 100);
+  } else {
+    if (val >= hi) return 0;
+    if (val <= lo) return 100;
+    return Math.round((hi - val) / (hi - lo) * 100);
+  }
 }
+
+function computePerQuestionFraud(sig) {
+  if (!sig || sig.wordCount < FRAUD_THRESHOLDS.wordCount.min) return { score: 0, level: 'low', details: [] };
+  const details = [];
+  let total = 0; let count = 0;
+
+  // High latency before recording (consulting AI)
+  if (sig.latencyMs !== null) {
+    const s = scoreFraudSignal(sig.latencyMs, FRAUD_THRESHOLDS.latency.low, FRAUD_THRESHOLDS.latency.high, true);
+    details.push({ label: 'Latencia de arranque', value: Math.round(sig.latencyMs/1000) + 's', score: s, flag: s > 60 ? (sig.latencyMs > 20000 ? 'Muy larga - posible consulta' : 'Larga') : null });
+    total += s; count++;
+  }
+
+  // High WPM (reading)
+  if (sig.wpm > 0) {
+    const s = scoreFraudSignal(sig.wpm, FRAUD_THRESHOLDS.wpm.low, FRAUD_THRESHOLDS.wpm.high, true);
+    details.push({ label: 'Velocidad de habla', value: sig.wpm + ' ppm', score: s, flag: s > 60 ? 'Alta - posible lectura' : null });
+    total += s; count++;
+  }
+
+  // High fluency ratio (reading = almost no interim discards)
+  if (sig.fluencyRatio > 0) {
+    const s = scoreFraudSignal(sig.fluencyRatio, FRAUD_THRESHOLDS.fluency.low, FRAUD_THRESHOLDS.fluency.high, true);
+    details.push({ label: 'Fluidez del habla', value: sig.fluencyRatio + '%', score: s, flag: s > 60 ? 'Demasiado fluido - sin dudas' : null });
+    total += s; count++;
+  }
+
+  // Low chunk variance (robotic uniform pace = reading)
+  if (sig.chunkVarianceMs > 0) {
+    const s = scoreFraudSignal(sig.chunkVarianceMs, FRAUD_THRESHOLDS.variance.low, FRAUD_THRESHOLDS.variance.high, false);
+    details.push({ label: 'Varianza de cadencia', value: sig.chunkVarianceMs + 'ms', score: s, flag: s > 60 ? 'Ritmo muy uniforme' : null });
+    total += s; count++;
+  }
+
+  const avg = count > 0 ? Math.round(total / count) : 0;
+  const level = avg >= 65 ? 'high' : avg >= 35 ? 'med' : 'low';
+  return { score: avg, level, details };
+}
+
+async function runFraudAnalysis() {
+  const perQuestion = [];
+  let globalTotal = 0;
+
+  for (let i = 0; i < state.questions.length; i++) {
+    const sig = state.fraudSignals[i] || {};
+    const behavioral = computePerQuestionFraud(sig);
+
+    // AI linguistic analysis of the transcript
+    let linguistic = { score: 0, analysis: '', markers: [] };
+    const ans = state.answers[i] || '';
+    if (ans && ans.trim().split(/\s+/).length >= 15) {
+      try {
+        const aiOut = await callOpenAI([{role:'user', content:
+          `Analiza si este texto transcrito de una respuesta oral tiene caracteristicas de texto generado por IA o leido, vs habla espontanea en español.
+
+Respuesta: "${ans.slice(0, 800)}"
+
+Busca: ausencia de muletillas (eh, bueno, o sea, a ver, es que), estructura demasiado perfecta, vocabulario excesivamente formal para ser oral, oraciones largas sin interrupciones, ausencia de auto-correcciones, inicio inmediato sin titubeos.
+
+Devuelve SOLO JSON: {"ai_score": 0-100, "markers_found": ["..."], "markers_absent": ["..."], "analysis": "frase corta en español"}`
+        }]);
+        const parsed = JSON.parse(aiOut.replace(/```json|```/g,'').trim());
+        linguistic = { score: parsed.ai_score || 0, analysis: parsed.analysis || '', markers: parsed.markers_found || [], absent: parsed.markers_absent || [] };
+      } catch { /* silent fail */ }
+    }
+
+    // Combined score: 60% behavioral, 40% linguistic
+    const combined = Math.round(behavioral.score * 0.6 + linguistic.score * 0.4);
+    const level = combined >= 65 ? 'high' : combined >= 35 ? 'med' : 'low';
+
+    perQuestion.push({
+      qIdx: i,
+      behavioral,
+      linguistic,
+      combined,
+      level,
+      sig
+    });
+    globalTotal += combined;
+  }
+
+  const globalScore = state.questions.length > 0 ? Math.round(globalTotal / state.questions.length) : 0;
+  const globalLevel = globalScore >= 65 ? 'high' : globalScore >= 35 ? 'med' : 'low';
+
+  // Build sheets columns for fraud data
+  const sheetsColumns = {};
+  perQuestion.forEach((pq, i) => {
+    const n = i + 1;
+    sheetsColumns[`Fraude_Sospecha_${n}`] = pq.combined;
+    sheetsColumns[`Fraude_Nivel_${n}`]    = pq.level;
+    sheetsColumns[`Fraude_Latencia_${n}`] = pq.sig.latencyMs ? Math.round(pq.sig.latencyMs/1000) + 's' : '';
+    sheetsColumns[`Fraude_WPM_${n}`]      = pq.sig.wpm || '';
+    sheetsColumns[`Fraude_AI_${n}`]       = pq.linguistic.score;
+    sheetsColumns[`Fraude_Analisis_${n}`] = pq.linguistic.analysis;
+  });
+
+  state._fraudReport = { globalScore, globalLevel, perQuestion, sheetsColumns };
+}
+
+function renderFraudReport() {
+  const report = state._fraudReport;
+  if (!report) return;
+
+  document.getElementById('fraudSection').style.display = 'block';
+
+  const levelLabels = { low: 'Baja', med: 'Media', high: 'Alta' };
+  const levelColors = { low: 'var(--success)', med: 'var(--warning)', high: 'var(--accent3)' };
+
+  // Global metrics grid
+  const avgLatency = report.perQuestion.filter(p=>p.sig.latencyMs).reduce((a,p)=>a+p.sig.latencyMs,0) / Math.max(report.perQuestion.filter(p=>p.sig.latencyMs).length,1);
+  const avgWpm = report.perQuestion.filter(p=>p.sig.wpm>0).reduce((a,p)=>a+p.sig.wpm,0) / Math.max(report.perQuestion.filter(p=>p.sig.wpm>0).length,1);
+  const highRisk = report.perQuestion.filter(p=>p.level==='high').length;
+
+  document.getElementById('fraudGrid').innerHTML = `
+    <div class="fraud-card risk-${report.globalLevel}">
+      <div class="fc-label">Sospecha global<\/div>
+      <div class="fc-val">${report.globalScore}\/100<\/div>
+      <div class="fc-sub">Nivel: ${levelLabels[report.globalLevel]}<\/div>
+    <\/div>
+    <div class="fraud-card">
+      <div class="fc-label">Latencia media<\/div>
+      <div class="fc-val">${Math.round(avgLatency/1000)}s<\/div>
+      <div class="fc-sub">Antes de grabar<\/div>
+    <\/div>
+    <div class="fraud-card">
+      <div class="fc-label">Velocidad media<\/div>
+      <div class="fc-val">${Math.round(avgWpm)} ppm<\/div>
+      <div class="fc-sub">Palabras\/minuto<\/div>
+    <\/div>
+    <div class="fraud-card risk-${highRisk > 0 ? 'high' : 'low'}">
+      <div class="fc-label">Preguntas de alto riesgo<\/div>
+      <div class="fc-val">${highRisk}\/${report.perQuestion.length}<\/div>
+      <div class="fc-sub">Requieren revision<\/div>
+    <\/div>`;
+
+  // Suspicion bar
+  const fillEl = document.getElementById('suspicionFill');
+  const pctEl  = document.getElementById('suspicionPct');
+  const barColor = report.globalScore >= 65 ? '#ff6b6b' : report.globalScore >= 35 ? '#fbbf24' : '#4ade80';
+  setTimeout(() => { fillEl.style.width = report.globalScore + '%'; fillEl.style.background = barColor; }, 300);
+  pctEl.textContent = report.globalScore + '%';
+
+  // Per-question detail
+  document.getElementById('fraudPerQ').innerHTML = report.perQuestion.map(pq => {
+    const flags = pq.behavioral.details.filter(d=>d.flag).map(d=>`<span style="color:var(--warning)">${d.label}: ${d.flag}<\/span>`).join(' &middot; ');
+    return `
+    <div class="fraud-q-row">
+      <div class="fqr-top">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">P${pq.qIdx+1}<\/span>
+        <span class="fqr-badge badge-${pq.level}">${levelLabels[pq.level]} (${pq.combined}\/100)<\/span>
+        <span style="font-size:11px;color:var(--text3);margin-left:auto">AI ling.: ${pq.linguistic.score}\/100<\/span>
+      <\/div>
+      <div class="fqr-metrics">
+        <span>Latencia: ${pq.sig.latencyMs ? Math.round(pq.sig.latencyMs/1000)+'s' : 'N\/A'}<\/span>
+        <span>Velocidad: ${pq.sig.wpm || 0} ppm<\/span>
+        <span>Fluidez: ${pq.sig.fluencyRatio || 0}%<\/span>
+        <span>Varianza: ${pq.sig.chunkVarianceMs || 0}ms<\/span>
+        <span>Palabras: ${pq.sig.wordCount || 0}<\/span>
+      <\/div>
+      ${flags ? `<div style="font-size:11px;margin-top:5px">${flags}<\/div>` : ''}
+      ${pq.linguistic.analysis ? `<div class="fqr-ai">Analisis linguistico: ${pq.linguistic.analysis}<\/div>` : ''}
+    <\/div>`;
+  }).join('');
+}
+
 </script>
 </body>
 </html>
