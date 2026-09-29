@@ -1,6 +1,7 @@
 cff-version: 1.2.0
 message: "Si usas este software, cítalo con estos metadatos."
 title: "Evaluador Oral"
+abstract: "Evaluación oral con IA para cualquier asignatura: preguntas ancladas en el trabajo del estudiante con citas comprobadas, respuestas habladas transcritas, repreguntas cuando falta algo, calificación con rúbrica revisable por el docente e indicadores de integridad orientativos."
 type: software
 authors:
   - family-names: "Borrás Rocher"
@@ -8,8 +9,15 @@ authors:
     affiliation: "Universidad Miguel Hernández de Elche"
     orcid: "https://orcid.org/0000-0002-5519-4573"
 doi: "10.5281/zenodo.21423283"
-version: "1.0.0"
-date-released: "2026-07-18"
+version: "2.0.0"
+date-released: "2026-09-27"
 url: "https://fborrasumh.github.io/evaluador_oral/"
 repository-code: "https://github.com/fborrasumh/evaluador_oral"
 license: MIT
+keywords:
+  - "evaluación oral"
+  - "defensa de trabajos"
+  - "rúbrica"
+  - "reconocimiento de voz"
+  - "educación superior"
+  - "inteligencia artificial"
